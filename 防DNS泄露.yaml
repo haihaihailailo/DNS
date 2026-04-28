@@ -425,11 +425,12 @@ rules:
   # =================================================
   
   # --- 特定域名指定 ---
-  - "DOMAIN-SUFFIX,googleapis.cn,节点选择"
-  - "DOMAIN-SUFFIX,gstatic.com,节点选择"
-  - "DOMAIN-SUFFIX,xn--ngstr-lra8j.com,节点选择"
-  - "DOMAIN-SUFFIX,github.io,节点选择"
-  - "DOMAIN,v2rayse.com,节点选择"
+  # 逻辑优化：统一交给“漏网之鱼”，避免与全局兜底策略分叉
+  - "DOMAIN-SUFFIX,googleapis.cn,漏网之鱼"
+  - "DOMAIN-SUFFIX,gstatic.com,漏网之鱼"
+  - "DOMAIN-SUFFIX,xn--ngstr-lra8j.com,漏网之鱼"
+  - "DOMAIN-SUFFIX,github.io,漏网之鱼"
+  - "DOMAIN,v2rayse.com,漏网之鱼"
   
   # --- 各大平台规则集 (Rule Providers) ---
   - "RULE-SET,icloud,苹果服务" # 修正了之前的逻辑错误，iCloud 归属苹果服务
@@ -453,9 +454,10 @@ rules:
   - "DOMAIN-SUFFIX,yhglobal.com,国内服务"
   
   # --- 全局兜底规则 (漏网之鱼处理) ---
-  - "RULE-SET,proxy,节点选择"
-  - "RULE-SET,gfw,节点选择"
-  - "RULE-SET,tld-not-cn,节点选择"
+  # 逻辑优化：三类海外规则统一走“漏网之鱼”，只保留一个最终出口决策点
+  - "RULE-SET,proxy,漏网之鱼"
+  - "RULE-SET,gfw,漏网之鱼"
+  - "RULE-SET,tld-not-cn,漏网之鱼"
   - "RULE-SET,applications,DIRECT"
   - "RULE-SET,private,DIRECT"
   - "RULE-SET,direct,DIRECT"
