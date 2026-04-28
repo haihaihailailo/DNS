@@ -38,6 +38,7 @@ dns:
   respect-rules: true
   use-system-hosts: false
   cache-algorithm: arc
+  ipv6: false
   enhanced-mode: fake-ip 
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
@@ -64,6 +65,8 @@ dns:
   fallback-filter:
     geoip: true
     geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
   
   proxy-server-nameserver: [https://223.5.5.5/dns-query]
   direct-nameserver: [https://223.5.5.5/dns-query]
@@ -187,8 +190,10 @@ proxy-groups:
   - &urltest_base
     name: 自动选择
     type: url-test
-    interval: 120
+    interval: 300
     tolerance: 50
+    url: "https://cp.cloudflare.com/generate_204"
+    lazy: true
     hidden: true
     include-all: true
     filter: "^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP)).*$"
