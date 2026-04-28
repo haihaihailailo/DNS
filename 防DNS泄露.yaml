@@ -38,6 +38,7 @@ dns:
   respect-rules: true
   use-system-hosts: false
   cache-algorithm: arc
+  ipv6: false
   enhanced-mode: fake-ip 
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
@@ -64,12 +65,15 @@ dns:
   fallback-filter:
     geoip: true
     geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
   
   proxy-server-nameserver: [https://223.5.5.5/dns-query]
   direct-nameserver: [https://223.5.5.5/dns-query]
   
   nameserver-policy:
     "geosite:private,cn": [https://223.5.5.5/dns-query, https://doh.pub/dns-query]
+    "geosite:geolocation-!cn": [https://1.1.1.1/dns-query, https://8.8.8.8/dns-query]
 
 # ================= 2. 策略组配置 =================
 proxy-groups:
@@ -100,26 +104,7 @@ proxy-groups:
   # --- 2. 漏网之鱼 (排在最前，全选项) ---
   - name: 漏网之鱼
     type: select
-    proxies:
-      - 自动选择
-      - 节点选择
-      - 香港-自动
-      - 香港节点
-      - 台湾-自动
-      - 台湾节点
-      - 日本-自动
-      - 日本节点
-      - 新加坡-自动
-      - 新加坡节点
-      - 美国-自动
-      - 美国节点
-      - 韩国-自动
-      - 韩国节点
-      - 越南-自动
-      - 越南节点
-      - 中国-自动
-      - 中国节点
-      - DIRECT
+    proxies: &all_regions_with_direct [自动选择, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, 中国-自动, 中国节点, DIRECT]
     icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/fish.svg"
 
   # --- 3. 地区分流出口 (专职服务，不混入应用组) ---
@@ -137,7 +122,7 @@ proxy-groups:
   
   - name: YouTube
     type: select
-    proxies: &all_regions_with_direct [自动选择, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, 中国-自动, 中国节点, DIRECT]
+    proxies: *all_regions_with_direct
     icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/youtube.svg"
 
   - name: Netflix
@@ -206,8 +191,10 @@ proxy-groups:
   - &urltest_base
     name: 自动选择
     type: url-test
-    interval: 120
+    interval: 300
     tolerance: 50
+    url: "https://cp.cloudflare.com/generate_204"
+    lazy: true
     hidden: true
     include-all: true
     filter: "^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP)).*$"
@@ -401,6 +388,9 @@ rules:
   # --- 局域网与本地 IP 直连 ---
   - "RULE-SET,lancidr,DIRECT,no-resolve"
   - "GEOIP,LAN,DIRECT,no-resolve"
+  - "RULE-SET,private,DIRECT"
+  - "RULE-SET,direct,DIRECT"
+  - "RULE-SET,applications,DIRECT"
   
   # --- 广告拦截 ---
   - "RULE-SET,reject,广告过滤"
@@ -470,7 +460,4 @@ rules:
   - "RULE-SET,proxy,节点选择"
   - "RULE-SET,gfw,节点选择"
   - "RULE-SET,tld-not-cn,节点选择"
-  - "RULE-SET,applications,DIRECT"
-  - "RULE-SET,private,DIRECT"
-  - "RULE-SET,direct,DIRECT"
   - "MATCH,漏网之鱼"
