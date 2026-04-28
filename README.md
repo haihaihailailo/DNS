@@ -8,6 +8,7 @@
 
 ## 已做的可维护性优化
 
+- 复用应用分流与“漏网之鱼”的全地区代理列表锚点，避免重复维护同一长列表。
 - 使用 YAML 锚点复用 `url-test` 公共参数，减少重复配置。
 - 使用 YAML 锚点复用 `rule-providers` 的公共下载参数（`domain/ipcidr/classical`）。
 
