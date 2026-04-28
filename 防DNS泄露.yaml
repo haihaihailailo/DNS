@@ -203,7 +203,8 @@ proxy-groups:
 
   # ================= 6. 底层节点库 (带高清国旗) =================
 
-  - name: 自动选择
+  - &urltest_base
+    name: 自动选择
     type: url-test
     interval: 120
     tolerance: 50
@@ -217,12 +218,8 @@ proxy-groups:
     include-all: true
     filter: "(?i)(广港|香港|HK|Hong Kong|🇭🇰|HongKong)"
     icon: "https://flagcdn.com/w320/hk.png"
-  - name: 香港-自动
-    type: url-test
-    interval: 120
-    tolerance: 50
-    hidden: true
-    include-all: true
+  - <<: *urltest_base
+    name: 香港-自动
     filter: "(?i)(广港|香港|HK|Hong Kong|🇭🇰|HongKong)"
     icon: "https://flagcdn.com/w320/hk.png"
 
@@ -231,12 +228,8 @@ proxy-groups:
     include-all: true
     filter: "(?i)(广台|台湾|台灣|TW|Tai Wan|🇹🇼|TaiWan|Taiwan)"
     icon: "https://flagcdn.com/w320/tw.png"
-  - name: 台湾-自动
-    type: url-test
-    interval: 120
-    tolerance: 50
-    hidden: true
-    include-all: true
+  - <<: *urltest_base
+    name: 台湾-自动
     filter: "(?i)(广台|台湾|台灣|TW|Tai Wan|🇹🇼|TaiWan|Taiwan)"
     icon: "https://flagcdn.com/w320/tw.png"
 
@@ -245,12 +238,8 @@ proxy-groups:
     include-all: true
     filter: "(?i)(广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan)"
     icon: "https://flagcdn.com/w320/jp.png"
-  - name: 日本-自动
-    type: url-test
-    interval: 120
-    tolerance: 50
-    hidden: true
-    include-all: true
+  - <<: *urltest_base
+    name: 日本-自动
     filter: "(?i)(广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan)"
     icon: "https://flagcdn.com/w320/jp.png"
 
@@ -259,12 +248,8 @@ proxy-groups:
     include-all: true
     filter: "(?i)(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)"
     icon: "https://flagcdn.com/w320/sg.png"
-  - name: 新加坡-自动
-    type: url-test
-    interval: 120
-    tolerance: 50
-    hidden: true
-    include-all: true
+  - <<: *urltest_base
+    name: 新加坡-自动
     filter: "(?i)(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)"
     icon: "https://flagcdn.com/w320/sg.png"
 
@@ -273,12 +258,8 @@ proxy-groups:
     include-all: true
     filter: "(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States)"
     icon: "https://flagcdn.com/w320/us.png"
-  - name: 美国-自动
-    type: url-test
-    interval: 120
-    tolerance: 50
-    hidden: true
-    include-all: true
+  - <<: *urltest_base
+    name: 美国-自动
     filter: "(?i)(广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States)"
     icon: "https://flagcdn.com/w320/us.png"
 
@@ -287,12 +268,8 @@ proxy-groups:
     include-all: true
     filter: "(?i)(广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea)"
     icon: "https://flagcdn.com/w320/kr.png"
-  - name: 韩国-自动
-    type: url-test
-    interval: 120
-    tolerance: 50
-    hidden: true
-    include-all: true
+  - <<: *urltest_base
+    name: 韩国-自动
     filter: "(?i)(广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea)"
     icon: "https://flagcdn.com/w320/kr.png"
 
@@ -301,12 +278,8 @@ proxy-groups:
     include-all: true
     filter: "(?i)(越南|VN|Vietnam|Ho Chi Minh|HoChiMinh|🇻🇳)"
     icon: "https://flagcdn.com/w320/vn.png"
-  - name: 越南-自动
-    type: url-test
-    interval: 120
-    tolerance: 50
-    hidden: true
-    include-all: true
+  - <<: *urltest_base
+    name: 越南-自动
     filter: "(?i)(越南|VN|Vietnam|Ho Chi Minh|HoChiMinh|🇻🇳)"
     icon: "https://flagcdn.com/w320/vn.png"
 
@@ -315,18 +288,14 @@ proxy-groups:
     include-all: true
     filter: "(?i)(广中|中国|CN|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)"
     icon: "https://flagcdn.com/w320/cn.png"
-  - name: 中国-自动
-    type: url-test
-    interval: 120
-    tolerance: 50
-    hidden: true
-    include-all: true
+  - <<: *urltest_base
+    name: 中国-自动
     filter: "(?i)(广中|中国|CN|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)"
     icon: "https://flagcdn.com/w320/cn.png"
 
 # ================= 3. 规则集下载 (已全面补齐) =================
 rule-providers:
-  reject:
+  reject: &rule_domain_base
     type: http
     format: yaml
     interval: 10800
@@ -334,62 +303,38 @@ rule-providers:
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
     path: "./ruleset/loyalsoldier/reject.yaml"
   icloud:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: domain
+    <<: *rule_domain_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
     path: "./ruleset/loyalsoldier/icloud.yaml"
   apple:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: domain
+    <<: *rule_domain_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
     path: "./ruleset/loyalsoldier/apple.yaml"
   google:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: domain
+    <<: *rule_domain_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt"
     path: "./ruleset/loyalsoldier/google.yaml"
   proxy:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: domain
+    <<: *rule_domain_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
     path: "./ruleset/loyalsoldier/proxy.yaml"
   direct:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: domain
+    <<: *rule_domain_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
     path: "./ruleset/loyalsoldier/direct.yaml"
   private:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: domain
+    <<: *rule_domain_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
     path: "./ruleset/loyalsoldier/private.yaml"
   gfw:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: domain
+    <<: *rule_domain_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
     path: "./ruleset/loyalsoldier/gfw.yaml"
   tld-not-cn:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: domain
+    <<: *rule_domain_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
     path: "./ruleset/loyalsoldier/tld-not-cn.yaml"
-  telegramcidr:
+  telegramcidr: &rule_ipcidr_base
     type: http
     format: yaml
     interval: 10800
@@ -397,20 +342,14 @@ rule-providers:
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
     path: "./ruleset/loyalsoldier/telegramcidr.yaml"
   cncidr:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: ipcidr
+    <<: *rule_ipcidr_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
     path: "./ruleset/loyalsoldier/cncidr.yaml"
   lancidr:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: ipcidr
+    <<: *rule_ipcidr_base
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
     path: "./ruleset/loyalsoldier/lancidr.yaml"
-  applications:
+  applications: &rule_classical_base
     type: http
     format: yaml
     interval: 10800
@@ -418,52 +357,31 @@ rule-providers:
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
     path: "./ruleset/loyalsoldier/applications.yaml"
   bahamut:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: classical
+    <<: *rule_classical_base
     url: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/rule/Bahamut.txt"
     path: "./ruleset/xiaolin-007/bahamut.yaml"
   YouTube:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: classical
+    <<: *rule_classical_base
     url: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/rule/YouTube.txt"
     path: "./ruleset/xiaolin-007/YouTube.yaml"
   Netflix:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: classical
+    <<: *rule_classical_base
     url: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/rule/Netflix.txt"
     path: "./ruleset/xiaolin-007/Netflix.yaml"
   Spotify:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: classical
+    <<: *rule_classical_base
     url: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/rule/Spotify.txt"
     path: "./ruleset/xiaolin-007/Spotify.yaml"
   BilibiliHMT:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: classical
+    <<: *rule_classical_base
     url: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/rule/BilibiliHMT.txt"
     path: "./ruleset/xiaolin-007/BilibiliHMT.yaml"
   AI:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: classical
+    <<: *rule_classical_base
     url: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/rule/AI.txt"
     path: "./ruleset/xiaolin-007/AI.yaml"
   TikTok:
-    type: http
-    format: yaml
-    interval: 10800
-    behavior: classical
+    <<: *rule_classical_base
     url: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/rule/TikTok.txt"
     path: "./ruleset/xiaolin-007/TikTok.yaml"
 
