@@ -30,3 +30,28 @@ jobs:
       - name: Parse YAML with aliases enabled
         run: |
           ruby -e 'require "yaml"; YAML.safe_load_file("防DNS泄露.yaml", aliases: true); puts "YAML OK"'
+
+  validate-mihomo:
+    name: Load config with mihomo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download mihomo
+        run: |
+          set -euo pipefail
+          release_json="$(curl -fsSL https://api.github.com/repos/MetaCubeX/mihomo/releases/latest)"
+          url="$(echo "$release_json" | jq -r '.assets[] | select(.name | test("^mihomo-linux-amd64-v1-v.*\\.gz$")) | .browser_download_url' | head -n 1)"
+          if [ -z "$url" ]; then
+            echo "No linux amd64 v1 mihomo asset found" >&2
+            exit 1
+          fi
+          curl -fsSL "$url" -o mihomo.gz
+          gzip -d mihomo.gz
+          chmod +x mihomo
+          ./mihomo -v
+
+      - name: Test config load
+        run: |
+          ./mihomo -t -f "防DNS泄露.yaml"
