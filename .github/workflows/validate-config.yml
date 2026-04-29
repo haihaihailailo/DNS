@@ -1,0 +1,32 @@
+name: Validate Clash config
+
+on:
+  push:
+    paths:
+      - "防DNS泄露.yaml"
+      - ".github/workflows/validate-config.yml"
+  pull_request:
+    paths:
+      - "防DNS泄露.yaml"
+      - ".github/workflows/validate-config.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-yaml:
+    name: Parse DNS config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - name: Parse YAML with aliases enabled
+        run: |
+          ruby -e 'require "yaml"; YAML.safe_load_file("防DNS泄露.yaml", aliases: true); puts "YAML OK"'
