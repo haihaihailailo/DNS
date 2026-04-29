@@ -34,7 +34,7 @@ tun:
 dns:
   enable: true
   listen: 0.0.0.0:1053
-  prefer-h3: true 
+  prefer-h3: false
   respect-rules: true
   use-system-hosts: false
   cache-algorithm: arc
@@ -73,6 +73,7 @@ dns:
   
   nameserver-policy:
     "geosite:private,cn": [https://223.5.5.5/dns-query, https://doh.pub/dns-query]
+    "geosite:gfw,geolocation-!cn": [https://1.1.1.1/dns-query, https://8.8.8.8/dns-query]
 
 # ================= 2. 策略组配置 =================
 proxy-groups:
@@ -373,19 +374,25 @@ rule-providers:
 
 # ================= 4. 路由规则 (已全面补齐关联) =================
 rules:
-  # --- BT 下载与 P2P 流量直连 (防止代理 IP 被封) ---
+  # --- BT 下载与 P2P 流量按进程直连 (避免宽泛端口规则误放行) ---
   - "PROCESS-NAME,aria2c,DIRECT"
+  - "PROCESS-NAME,aria2c.exe,DIRECT"
   - "PROCESS-NAME,BitComet,DIRECT"
+  - "PROCESS-NAME,BitComet.exe,DIRECT"
   - "PROCESS-NAME,qBittorrent,DIRECT"
+  - "PROCESS-NAME,qbittorrent.exe,DIRECT"
   - "PROCESS-NAME,Transmission,DIRECT"
+  - "PROCESS-NAME,transmission-daemon,DIRECT"
   - "PROCESS-NAME,utorrent,DIRECT"
+  - "PROCESS-NAME,uTorrent.exe,DIRECT"
   - "PROCESS-NAME,Thunder,DIRECT"
   - "PROCESS-NAME,Xunlei,DIRECT"
-  - "DST-PORT,6881-6889,DIRECT"
-  - "DST-PORT,51413,DIRECT"
   
-  # --- 局域网与本地 IP 直连 ---
+  # --- 局域网、本地与明确直连规则提前命中 ---
   - "RULE-SET,lancidr,DIRECT,no-resolve"
+  - "RULE-SET,private,DIRECT"
+  - "RULE-SET,direct,DIRECT"
+  - "RULE-SET,applications,DIRECT"
   - "GEOIP,LAN,DIRECT,no-resolve"
   
   # --- 广告拦截 ---
@@ -458,7 +465,4 @@ rules:
   - "RULE-SET,proxy,漏网之鱼"
   - "RULE-SET,gfw,漏网之鱼"
   - "RULE-SET,tld-not-cn,漏网之鱼"
-  - "RULE-SET,applications,DIRECT"
-  - "RULE-SET,private,DIRECT"
-  - "RULE-SET,direct,DIRECT"
   - "MATCH,漏网之鱼"
