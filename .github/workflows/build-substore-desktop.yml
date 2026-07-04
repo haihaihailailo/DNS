@@ -5,6 +5,10 @@ on:
     paths:
       - "tools/sub-store-desktop/**"
       - ".github/workflows/build-substore-desktop.yml"
+  pull_request:
+    paths:
+      - "tools/sub-store-desktop/**"
+      - ".github/workflows/build-substore-desktop.yml"
   workflow_dispatch:
 
 permissions:
@@ -13,6 +17,7 @@ permissions:
 jobs:
   build-windows-desktop:
     runs-on: windows-latest
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
