@@ -208,6 +208,8 @@ OVERRIDE["proxy-groups"] = [
   { name: "AI", type: "select", proxies: ["美国节点", "日本节点", "新加坡节点", "香港节点", "美国-自动", "日本-自动", "新加坡-自动", "香港-自动", "节点选择", "DIRECT"], url: "https://chatgpt.com/cdn-cgi/trace", "expected-status": 200, interval: 300, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/chatgpt.svg" },
   { name: "谷歌服务", type: "select", proxies: ["节点选择", "新加坡节点", "日本节点", "香港节点", "美国节点", "新加坡-自动", "日本-自动", "香港-自动", "美国-自动", "自动选择", "DIRECT"], url: "https://www.gstatic.com/generate_204", "expected-status": 204, interval: 300, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/google.svg" },
   { name: "电报消息", type: "select", proxies: ["新加坡-自动", "自动选择", "节点选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "中国-自动", "中国节点", "DIRECT"], url: "https://core.telegram.org", "expected-status": "200/301/302", interval: 300, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg" },
+  { name: "Meta / X", type: "select", proxies: ["节点选择", "自动选择", "新加坡-自动", "新加坡节点", "香港-自动", "香港节点", "日本-自动", "日本节点", "美国-自动", "美国节点", "台湾-自动", "台湾节点", "DIRECT"], url: "https://www.facebook.com", "expected-status": "200/301/302", interval: 300, icon: "https://www.facebook.com/favicon.ico" },
+  { name: "游戏平台", type: "select", proxies: ["节点选择", "DIRECT", "自动选择", "香港-自动", "香港节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点"], url: "https://store.steampowered.com", "expected-status": "200/301/302", interval: 300, icon: "https://store.steampowered.com/favicon.ico" },
   { name: "微软服务", type: "select", proxies: ["DIRECT", "香港-自动", "新加坡-自动", "中国-自动", "香港节点", "新加坡节点", "中国节点", "美国-自动", "美国节点", "节点选择"], url: "http://www.msftconnecttest.com/connecttest.txt", "expected-status": 200, interval: 300, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/microsoft.svg" },
   { name: "TikTok", type: "select", proxies: ["节点选择", "自动选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "DIRECT"], url: "https://www.tiktok.com", "expected-status": "200/301/302", interval: 300, icon: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/icon/tiktok.svg" },
   { name: "苹果服务", type: "select", proxies: ["DIRECT", "自动选择", "节点选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "中国-自动", "中国节点"], url: "https://www.apple.com/library/test/success.html", "expected-status": 200, interval: 300, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/apple.svg" },
@@ -279,14 +281,14 @@ PROCESS-NAME,com.google.android.apps.bard,AI
 PROCESS-NAME,com.anthropic.claude,AI
 PROCESS-NAME,ai.perplexity.app.android,AI
 PROCESS-NAME,com.microsoft.copilot,AI
-PROCESS-NAME,com.twitter.android,节点选择
-PROCESS-NAME,com.facebook.katana,节点选择
-PROCESS-NAME,com.facebook.orca,节点选择
-PROCESS-NAME,com.instagram.android,节点选择
-PROCESS-NAME,com.instagram.barcelona,节点选择
+PROCESS-NAME,com.twitter.android,Meta / X
+PROCESS-NAME,com.facebook.katana,Meta / X
+PROCESS-NAME,com.facebook.orca,Meta / X
+PROCESS-NAME,com.instagram.android,Meta / X
+PROCESS-NAME,com.instagram.barcelona,Meta / X
 PROCESS-NAME,org.telegram.messenger,电报消息
 PROCESS-NAME,org.telegram.group,电报消息
-PROCESS-NAME,com.whatsapp,节点选择
+PROCESS-NAME,com.whatsapp,Meta / X
 PROCESS-NAME,com.reddit.frontpage,节点选择
 PROCESS-NAME,com.discord,节点选择
 PROCESS-NAME,org.thoughtcrime.securesms,节点选择
@@ -548,7 +550,7 @@ PROCESS-NAME,tv.twitch.android.app,节点选择
 PROCESS-NAME,tv.danmaku.bili,哔哩哔哩港澳台
 PROCESS-NAME,com.bstar.intl,哔哩哔哩港澳台
 PROCESS-NAME,com.github.android,GitHub
-PROCESS-NAME,com.valvesoftware.android.steam.community,节点选择
+PROCESS-NAME,com.valvesoftware.android.steam.community,游戏平台
 PROCESS-NAME,zed.rainxch.githubstore,GitHub
 PROCESS-NAME,com.zing.zalo,越南服务
 PROCESS-NAME,com.shopee.vn,越南服务
@@ -569,10 +571,10 @@ PROCESS-NAME,codex.exe,AI
 PROCESS-NAME,codex,AI
 PROCESS-NAME,Telegram.exe,电报消息
 PROCESS-NAME,Discord.exe,节点选择
-PROCESS-NAME,WhatsApp.exe,节点选择
+PROCESS-NAME,WhatsApp.exe,Meta / X
 PROCESS-NAME,Signal.exe,节点选择
 PROCESS-NAME,LINE.exe,节点选择
-PROCESS-NAME,Messenger.exe,节点选择
+PROCESS-NAME,Messenger.exe,Meta / X
 PROCESS-NAME,Zalo.exe,越南服务
 PROCESS-NAME,Zalo,越南服务
 PROCESS-NAME,WeChat.exe,国内服务
@@ -616,8 +618,8 @@ PROCESS-NAME,MiPhoneManager.exe,国内服务
 PROCESS-NAME,OPPOPCSuite.exe,国内服务
 PROCESS-NAME,OnePlusPCSuite.exe,国内服务
 PROCESS-NAME,Spotify.exe,Spotify
-PROCESS-NAME,steam.exe,节点选择
-PROCESS-NAME,steamwebhelper.exe,节点选择
+PROCESS-NAME,steam.exe,游戏平台
+PROCESS-NAME,steamwebhelper.exe,游戏平台
 PROCESS-NAME,GitHubDesktop.exe,GitHub
 PROCESS-NAME,Cursor.exe,AI
 PROCESS-NAME,Windsurf.exe,AI
@@ -628,13 +630,13 @@ PROCESS-NAME,JetBrains Toolbox.exe,节点选择
 PROCESS-NAME,idea64.exe,节点选择
 PROCESS-NAME,pycharm64.exe,节点选择
 PROCESS-NAME,webstorm64.exe,节点选择
-PROCESS-NAME,EpicGamesLauncher.exe,节点选择
-PROCESS-NAME,EpicWebHelper.exe,节点选择
-PROCESS-NAME,Battle.net.exe,节点选择
-PROCESS-NAME,RiotClientServices.exe,节点选择
-PROCESS-NAME,UbisoftConnect.exe,节点选择
-PROCESS-NAME,EA app.exe,节点选择
-PROCESS-NAME,EADesktop.exe,节点选择
+PROCESS-NAME,EpicGamesLauncher.exe,游戏平台
+PROCESS-NAME,EpicWebHelper.exe,游戏平台
+PROCESS-NAME,Battle.net.exe,游戏平台
+PROCESS-NAME,RiotClientServices.exe,游戏平台
+PROCESS-NAME,UbisoftConnect.exe,游戏平台
+PROCESS-NAME,EA app.exe,游戏平台
+PROCESS-NAME,EADesktop.exe,游戏平台
 PROCESS-NAME,ms-teams.exe,节点选择
 PROCESS-NAME,Teams.exe,节点选择
 PROCESS-NAME,Zoom.exe,节点选择
@@ -723,6 +725,30 @@ DOMAIN,msedge.api.cdp.microsoft.com,微软服务
 RULE-SET,microsoft,微软服务
 RULE-SET,telegram,电报消息
 RULE-SET,telegramcidr,电报消息,no-resolve
+DOMAIN-SUFFIX,x.com,Meta / X
+DOMAIN-SUFFIX,twitter.com,Meta / X
+DOMAIN-SUFFIX,t.co,Meta / X
+DOMAIN-SUFFIX,twimg.com,Meta / X
+DOMAIN-SUFFIX,facebook.com,Meta / X
+DOMAIN-SUFFIX,facebook.net,Meta / X
+DOMAIN-SUFFIX,fbcdn.net,Meta / X
+DOMAIN-SUFFIX,messenger.com,Meta / X
+DOMAIN-SUFFIX,instagram.com,Meta / X
+DOMAIN-SUFFIX,cdninstagram.com,Meta / X
+DOMAIN-SUFFIX,threads.net,Meta / X
+DOMAIN-SUFFIX,whatsapp.com,Meta / X
+DOMAIN-SUFFIX,whatsapp.net,Meta / X
+DOMAIN-SUFFIX,steampowered.com,游戏平台
+DOMAIN-SUFFIX,steamcommunity.com,游戏平台
+DOMAIN-SUFFIX,steamstatic.com,游戏平台
+DOMAIN-SUFFIX,steamcontent.com,游戏平台
+DOMAIN-SUFFIX,epicgames.com,游戏平台
+DOMAIN-SUFFIX,epicgamescdn.com,游戏平台
+DOMAIN-SUFFIX,battle.net,游戏平台
+DOMAIN-SUFFIX,blizzard.com,游戏平台
+DOMAIN-SUFFIX,riotgames.com,游戏平台
+DOMAIN-SUFFIX,ubisoft.com,游戏平台
+DOMAIN-SUFFIX,ea.com,游戏平台
 RULE-SET,netflix,Netflix
 RULE-SET,tiktok,TikTok
 RULE-SET,spotify,Spotify

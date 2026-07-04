@@ -279,6 +279,26 @@ proxy-groups:
     icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg"
 
 
+  # Meta / X：Facebook、Instagram、Threads、Messenger、WhatsApp、X / Twitter 统一策略。
+  - name: Meta / X
+    type: select
+    proxies: [节点选择, 自动选择, 新加坡-自动, 新加坡节点, 香港-自动, 香港节点, 日本-自动, 日本节点, 美国-自动, 美国节点, 台湾-自动, 台湾节点, DIRECT]
+    url: "https://www.facebook.com"
+    expected-status: 200/301/302
+    interval: 300
+    icon: "https://www.facebook.com/favicon.ico"
+
+
+  # 游戏平台：Steam、Epic、Battle.net、Riot、Ubisoft、EA 等平台单独切换。
+  - name: 游戏平台
+    type: select
+    proxies: [节点选择, DIRECT, 自动选择, 香港-自动, 香港节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点]
+    url: "https://store.steampowered.com"
+    expected-status: 200/301/302
+    interval: 300
+    icon: "https://store.steampowered.com/favicon.ico"
+
+
   # Microsoft：Windows 更新、商店、Edge、Microsoft 账号等服务。
   - name: 微软服务
     type: select
@@ -627,14 +647,14 @@ rules:
   - PROCESS-NAME,com.microsoft.copilot,AI # Microsoft Copilot
 
   # --- 海外社交 / 通讯 ---
-  - PROCESS-NAME,com.twitter.android,节点选择 # X / Twitter
-  - PROCESS-NAME,com.facebook.katana,节点选择 # Facebook
-  - PROCESS-NAME,com.facebook.orca,节点选择 # Messenger
-  - PROCESS-NAME,com.instagram.android,节点选择 # Instagram
-  - PROCESS-NAME,com.instagram.barcelona,节点选择 # Threads
+  - PROCESS-NAME,com.twitter.android,Meta / X # X / Twitter
+  - PROCESS-NAME,com.facebook.katana,Meta / X # Facebook
+  - PROCESS-NAME,com.facebook.orca,Meta / X # Messenger
+  - PROCESS-NAME,com.instagram.android,Meta / X # Instagram
+  - PROCESS-NAME,com.instagram.barcelona,Meta / X # Threads
   - PROCESS-NAME,org.telegram.messenger,电报消息 # Telegram
   - PROCESS-NAME,org.telegram.group,电报消息 # Turrit
-  - PROCESS-NAME,com.whatsapp,节点选择 # WhatsApp
+  - PROCESS-NAME,com.whatsapp,Meta / X # WhatsApp
   - PROCESS-NAME,com.reddit.frontpage,节点选择 # Reddit
   - PROCESS-NAME,com.discord,节点选择 # Discord
   - PROCESS-NAME,org.thoughtcrime.securesms,节点选择 # Signal
@@ -909,7 +929,7 @@ rules:
 
   # --- GitHub / 浏览器 / 游戏平台 ---
   - PROCESS-NAME,com.github.android,GitHub # GitHub
-  - PROCESS-NAME,com.valvesoftware.android.steam.community,节点选择 # Steam
+  - PROCESS-NAME,com.valvesoftware.android.steam.community,游戏平台 # Steam
   - PROCESS-NAME,zed.rainxch.githubstore,GitHub # GitHub Store
   # - PROCESS-NAME,com.yjllq.chrome.beta,节点选择 # 雨见 cBeta（浏览器不按包名固定，交给域名规则分流）
 
@@ -939,10 +959,10 @@ rules:
   # --- 桌面端海外社交 / 通讯 ---
   - PROCESS-NAME,Telegram.exe,电报消息 # Telegram Desktop
   - PROCESS-NAME,Discord.exe,节点选择 # Discord Desktop
-  - PROCESS-NAME,WhatsApp.exe,节点选择 # WhatsApp Desktop
+  - PROCESS-NAME,WhatsApp.exe,Meta / X # WhatsApp Desktop
   - PROCESS-NAME,Signal.exe,节点选择 # Signal Desktop
   - PROCESS-NAME,LINE.exe,节点选择 # LINE Desktop
-  - PROCESS-NAME,Messenger.exe,节点选择 # Messenger Desktop
+  - PROCESS-NAME,Messenger.exe,Meta / X # Messenger Desktop
 
   # --- 桌面端越南服务 ---
   - PROCESS-NAME,Zalo.exe,越南服务 # Zalo PC
@@ -991,8 +1011,8 @@ rules:
 
   # --- 桌面端影音 / 游戏 / 开发 ---
   - PROCESS-NAME,Spotify.exe,Spotify # Spotify Desktop
-  - PROCESS-NAME,steam.exe,节点选择 # Steam
-  - PROCESS-NAME,steamwebhelper.exe,节点选择 # Steam Web Helper
+  - PROCESS-NAME,steam.exe,游戏平台 # Steam
+  - PROCESS-NAME,steamwebhelper.exe,游戏平台 # Steam Web Helper
   - PROCESS-NAME,GitHubDesktop.exe,GitHub # GitHub Desktop
   - PROCESS-NAME,Cursor.exe,AI # Cursor Editor
   - PROCESS-NAME,Windsurf.exe,AI # Windsurf Editor
@@ -1003,13 +1023,13 @@ rules:
   - PROCESS-NAME,idea64.exe,节点选择 # IntelliJ IDEA
   - PROCESS-NAME,pycharm64.exe,节点选择 # PyCharm
   - PROCESS-NAME,webstorm64.exe,节点选择 # WebStorm
-  - PROCESS-NAME,EpicGamesLauncher.exe,节点选择 # Epic Games Launcher
-  - PROCESS-NAME,EpicWebHelper.exe,节点选择 # Epic Games Web Helper
-  - PROCESS-NAME,Battle.net.exe,节点选择 # Battle.net
-  - PROCESS-NAME,RiotClientServices.exe,节点选择 # Riot Client
-  - PROCESS-NAME,UbisoftConnect.exe,节点选择 # Ubisoft Connect
-  - PROCESS-NAME,EA app.exe,节点选择 # EA App
-  - PROCESS-NAME,EADesktop.exe,节点选择 # EA Desktop
+  - PROCESS-NAME,EpicGamesLauncher.exe,游戏平台 # Epic Games Launcher
+  - PROCESS-NAME,EpicWebHelper.exe,游戏平台 # Epic Games Web Helper
+  - PROCESS-NAME,Battle.net.exe,游戏平台 # Battle.net
+  - PROCESS-NAME,RiotClientServices.exe,游戏平台 # Riot Client
+  - PROCESS-NAME,UbisoftConnect.exe,游戏平台 # Ubisoft Connect
+  - PROCESS-NAME,EA app.exe,游戏平台 # EA App
+  - PROCESS-NAME,EADesktop.exe,游戏平台 # EA Desktop
   - PROCESS-NAME,ms-teams.exe,节点选择 # Microsoft Teams
   - PROCESS-NAME,Teams.exe,节点选择 # Microsoft Teams Classic
   - PROCESS-NAME,Zoom.exe,节点选择 # Zoom
@@ -1106,6 +1126,32 @@ rules:
 
   - "RULE-SET,telegram,电报消息"
   - "RULE-SET,telegramcidr,电报消息,no-resolve"
+
+  - "DOMAIN-SUFFIX,x.com,Meta / X"
+  - "DOMAIN-SUFFIX,twitter.com,Meta / X"
+  - "DOMAIN-SUFFIX,t.co,Meta / X"
+  - "DOMAIN-SUFFIX,twimg.com,Meta / X"
+  - "DOMAIN-SUFFIX,facebook.com,Meta / X"
+  - "DOMAIN-SUFFIX,facebook.net,Meta / X"
+  - "DOMAIN-SUFFIX,fbcdn.net,Meta / X"
+  - "DOMAIN-SUFFIX,messenger.com,Meta / X"
+  - "DOMAIN-SUFFIX,instagram.com,Meta / X"
+  - "DOMAIN-SUFFIX,cdninstagram.com,Meta / X"
+  - "DOMAIN-SUFFIX,threads.net,Meta / X"
+  - "DOMAIN-SUFFIX,whatsapp.com,Meta / X"
+  - "DOMAIN-SUFFIX,whatsapp.net,Meta / X"
+
+  - "DOMAIN-SUFFIX,steampowered.com,游戏平台"
+  - "DOMAIN-SUFFIX,steamcommunity.com,游戏平台"
+  - "DOMAIN-SUFFIX,steamstatic.com,游戏平台"
+  - "DOMAIN-SUFFIX,steamcontent.com,游戏平台"
+  - "DOMAIN-SUFFIX,epicgames.com,游戏平台"
+  - "DOMAIN-SUFFIX,epicgamescdn.com,游戏平台"
+  - "DOMAIN-SUFFIX,battle.net,游戏平台"
+  - "DOMAIN-SUFFIX,blizzard.com,游戏平台"
+  - "DOMAIN-SUFFIX,riotgames.com,游戏平台"
+  - "DOMAIN-SUFFIX,ubisoft.com,游戏平台"
+  - "DOMAIN-SUFFIX,ea.com,游戏平台"
   - "RULE-SET,netflix,Netflix"
   - "RULE-SET,tiktok,TikTok"
   - "RULE-SET,spotify,Spotify"
