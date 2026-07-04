@@ -1,7 +1,2 @@
 @echo off
-setlocal
-
-set "SCRIPT_DIR=%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%SubStoreLauncher.ps1"
-
-endlocal
+echo This helper has been deprecated because Sub-Store is used in the browser.
