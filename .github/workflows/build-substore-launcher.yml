@@ -5,6 +5,10 @@ on:
     paths:
       - "tools/sub-store-windows-exe/**"
       - ".github/workflows/build-substore-launcher.yml"
+  pull_request:
+    paths:
+      - "tools/sub-store-windows-exe/**"
+      - ".github/workflows/build-substore-launcher.yml"
   workflow_dispatch:
 
 permissions:
@@ -13,6 +17,7 @@ permissions:
 jobs:
   build-windows-exe:
     runs-on: windows-latest
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
