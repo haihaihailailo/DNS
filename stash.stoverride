@@ -399,6 +399,34 @@ rule-providers: #!replace
     interval: 86400
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs
     path: ./ruleset/metacubex/telegramcidr.mrs
+  twitter:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.mrs
+    path: ./ruleset/metacubex/twitter.mrs
+  facebook:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs
+    path: ./ruleset/metacubex/facebook.mrs
+  steam:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs
+    path: ./ruleset/metacubex/steam.mrs
+  category-games:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.mrs
+    path: ./ruleset/metacubex/category-games.mrs
 
 rules: #!replace
   - IP-CIDR,0.0.0.0/8,DIRECT,no-resolve
@@ -447,6 +475,8 @@ rules: #!replace
   - DOMAIN-SUFFIX,threads.net,Meta / X
   - DOMAIN-SUFFIX,whatsapp.com,Meta / X
   - DOMAIN-SUFFIX,whatsapp.net,Meta / X
+  - RULE-SET,twitter,Meta / X
+  - RULE-SET,facebook,Meta / X
   - DOMAIN-SUFFIX,steampowered.com,游戏平台
   - DOMAIN-SUFFIX,steamcommunity.com,游戏平台
   - DOMAIN-SUFFIX,steamstatic.com,游戏平台
@@ -458,6 +488,8 @@ rules: #!replace
   - DOMAIN-SUFFIX,riotgames.com,游戏平台
   - DOMAIN-SUFFIX,ubisoft.com,游戏平台
   - DOMAIN-SUFFIX,ea.com,游戏平台
+  - RULE-SET,steam,游戏平台
+  - RULE-SET,category-games,游戏平台
   - RULE-SET,netflix,Netflix
   - RULE-SET,tiktok,TikTok
   - RULE-SET,spotify,Spotify

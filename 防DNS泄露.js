@@ -738,6 +738,8 @@ DOMAIN-SUFFIX,cdninstagram.com,Meta / X
 DOMAIN-SUFFIX,threads.net,Meta / X
 DOMAIN-SUFFIX,whatsapp.com,Meta / X
 DOMAIN-SUFFIX,whatsapp.net,Meta / X
+RULE-SET,twitter,Meta / X
+RULE-SET,facebook,Meta / X
 DOMAIN-SUFFIX,steampowered.com,游戏平台
 DOMAIN-SUFFIX,steamcommunity.com,游戏平台
 DOMAIN-SUFFIX,steamstatic.com,游戏平台
@@ -749,6 +751,8 @@ DOMAIN-SUFFIX,blizzard.com,游戏平台
 DOMAIN-SUFFIX,riotgames.com,游戏平台
 DOMAIN-SUFFIX,ubisoft.com,游戏平台
 DOMAIN-SUFFIX,ea.com,游戏平台
+RULE-SET,steam,游戏平台
+RULE-SET,category-games,游戏平台
 RULE-SET,netflix,Netflix
 RULE-SET,tiktok,TikTok
 RULE-SET,spotify,Spotify
