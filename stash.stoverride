@@ -2,7 +2,7 @@ name: Mihomo DNS 防泄露 Stash 覆写
 summary: DNS 防泄露、fake-ip、IPv6、策略组和规则全接管；主订阅直接提供节点。
 
 # 直接机场订阅版：主配置必须直接包含 proxies 节点。
-# 适用结构：Stash 直接导入机场 URL，然后用本覆写接管 DNS / 策略组 / 规则。
+# 适用结构：Stash 直接导入机场 URL，然后用本覆写接管 DNS / Sniffer / 策略组 / 规则。
 # 地区/自动策略组使用 include-all 自动吸取主订阅节点，不要使用 use: [SubStore]。
 # proxy-groups / rule-providers / rules 必须保留 #!replace，避免和机场原策略组追加合并导致重名。
 
@@ -56,6 +56,45 @@ dns: #!replace
     "geosite:openai": https://1.1.1.1/dns-query
     "geosite:github": https://1.1.1.1/dns-query
     "+.googleapis.cn": https://1.1.1.1/dns-query
+
+sniffer: #!replace
+  enable: true
+  parse-pure-ip: true
+  skip-domain:
+    - "+.lan"
+    - "+.local"
+    - "+.home.arpa"
+    - "+.localdomain"
+    - "router.asus.com"
+    - "tplogin.cn"
+    - "miwifi.com"
+    - "tendawifi.com"
+    - "time.*.com"
+    - "time.*.gov"
+    - "time.windows.com"
+    - "pool.ntp.org"
+    - "+.ntp.org"
+    - "+.push.apple.com"
+    - "courier.push.apple.com"
+    - "localhost.ptlogin2.qq.com"
+    - "localhost.sec.qq.com"
+    - "localhost.work.weixin.qq.com"
+  skip-dst-address:
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+    - 100.64.0.0/10
+    - 169.254.0.0/16
+    - fc00::/7
+    - fe80::/10
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
 
 proxy-groups: #!replace
   - name: 节点选择
