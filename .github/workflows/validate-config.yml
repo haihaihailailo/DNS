@@ -5,11 +5,13 @@ on:
     paths:
       - "防DNS泄露.yaml"
       - "防DNS泄露.js"
+      - "stash.stoverride"
       - ".github/workflows/validate-config.yml"
   pull_request:
     paths:
       - "防DNS泄露.yaml"
       - "防DNS泄露.js"
+      - "stash.stoverride"
       - ".github/workflows/validate-config.yml"
   schedule:
     # 每周一 04:30 新加坡时间自动校验一次，提前发现 mihomo/远程规则/下载链路变化。
@@ -39,7 +41,7 @@ jobs:
 
       - name: Parse YAML with aliases enabled
         run: |
-          ruby -e 'require "yaml"; ["防DNS泄露.yaml"].each { |file| YAML.safe_load_file(file, aliases: true); puts "#{file} YAML OK" }'
+          ruby -e 'require "yaml"; ["防DNS泄露.yaml", "stash.stoverride"].each { |file| YAML.safe_load_file(file, aliases: true); puts "#{file} YAML OK" }'
 
       - name: Check JavaScript syntax
         run: |
@@ -139,60 +141,70 @@ jobs:
           ruby <<'RUBY'
           require "yaml"
 
-          config = YAML.safe_load_file("防DNS泄露.yaml", aliases: true)
-          groups = Array(config["proxy-groups"])
-          group_names = groups.map { |group| group["name"] }.compact
-          provider_names = Hash(config["rule-providers"] || {}).keys
-          rules = Array(config["rules"]).map { |rule| rule.to_s.strip }.reject(&:empty?)
+          files_to_check = ["防DNS泄露.yaml", "stash.stoverride"]
           built_in_policies = %w[DIRECT REJECT REJECT-DROP REJECT-TINYGIF PASS COMPATIBLE]
-          valid_policies = group_names + built_in_policies
-          errors = []
+          all_errors = []
 
-          duplicate_groups = group_names.group_by(&:itself).select { |_name, values| values.length > 1 }.keys
-          duplicate_groups.each { |name| errors << "Duplicate proxy group: #{name}" }
+          files_to_check.each do |file|
+            config = YAML.safe_load_file(file, aliases: true)
+            groups = Array(config["proxy-groups"])
+            group_names = groups.map { |group| group["name"] }.compact
+            provider_names = Hash(config["rule-providers"] || {}).keys
+            rules = Array(config["rules"]).map { |rule| rule.to_s.strip }.reject(&:empty?)
+            valid_policies = group_names + built_in_policies
+            errors = []
 
-          duplicate_rules = rules.group_by(&:itself).select { |_rule, values| values.length > 1 }.keys
-          duplicate_rules.each { |rule| errors << "Duplicate rule: #{rule}" }
+            duplicate_groups = group_names.group_by(&:itself).select { |_name, values| values.length > 1 }.keys
+            duplicate_groups.each { |name| errors << "Duplicate proxy group: #{name}" }
 
-          groups.each do |group|
-            Array(group["proxies"]).each do |proxy|
-              next if valid_policies.include?(proxy)
-              errors << "Proxy group #{group['name']} references unknown proxy/group: #{proxy}"
+            duplicate_rules = rules.group_by(&:itself).select { |_rule, values| values.length > 1 }.keys
+            duplicate_rules.each { |rule| errors << "Duplicate rule: #{rule}" }
+
+            groups.each do |group|
+              Array(group["proxies"]).each do |proxy|
+                next if valid_policies.include?(proxy)
+                errors << "Proxy group #{group['name']} references unknown proxy/group: #{proxy}"
+              end
             end
-          end
 
-          rules.each_with_index do |rule, index|
-            parts = rule.split(",").map(&:strip)
-            type = parts[0]
+            rules.each_with_index do |rule, index|
+              parts = rule.split(",").map(&:strip)
+              type = parts[0]
 
-            if type == "RULE-SET"
-              provider = parts[1]
-              policy = parts[2]
-              errors << "Rule ##{index + 1} references unknown rule-provider: #{provider}" unless provider_names.include?(provider)
-              errors << "Rule ##{index + 1} references unknown policy: #{policy}" unless valid_policies.include?(policy)
-            elsif type == "MATCH"
-              policy = parts[1]
-              errors << "Rule ##{index + 1} references unknown policy: #{policy}" unless valid_policies.include?(policy)
+              if type == "RULE-SET"
+                provider = parts[1]
+                policy = parts[2]
+                errors << "Rule ##{index + 1} references unknown rule-provider: #{provider}" unless provider_names.include?(provider)
+                errors << "Rule ##{index + 1} references unknown policy: #{policy}" unless valid_policies.include?(policy)
+              elsif type == "MATCH"
+                policy = parts[1]
+                errors << "Rule ##{index + 1} references unknown policy: #{policy}" unless valid_policies.include?(policy)
+              else
+                policy = parts[2]
+                errors << "Rule ##{index + 1} is too short: #{rule}" if policy.nil? || policy.empty?
+                errors << "Rule ##{index + 1} references unknown policy: #{policy}" if policy && !valid_policies.include?(policy)
+              end
+            end
+
+            Hash(config.dig("dns", "nameserver-policy") || {}).each_key do |key|
+              next unless key.to_s.start_with?("rule-set:")
+              provider = key.to_s.sub(/^rule-set:/, "")
+              errors << "dns.nameserver-policy references unknown rule-provider: #{provider}" unless provider_names.include?(provider)
+            end
+
+            if errors.any?
+              all_errors << "#{file}:"
+              errors.each { |error| all_errors << "- #{error}" }
             else
-              policy = parts[2]
-              errors << "Rule ##{index + 1} is too short: #{rule}" if policy.nil? || policy.empty?
-              errors << "Rule ##{index + 1} references unknown policy: #{policy}" if policy && !valid_policies.include?(policy)
+              puts "#{file} reference integrity passed: #{group_names.length} proxy groups, #{provider_names.length} rule providers, #{rules.length} rules."
             end
           end
 
-          Hash(config.dig("dns", "nameserver-policy") || {}).each_key do |key|
-            next unless key.to_s.start_with?("rule-set:")
-            provider = key.to_s.sub(/^rule-set:/, "")
-            errors << "dns.nameserver-policy references unknown rule-provider: #{provider}" unless provider_names.include?(provider)
-          end
-
-          if errors.any?
+          if all_errors.any?
             puts "Reference integrity check failed:"
-            errors.each { |error| puts "- #{error}" }
+            puts all_errors
             exit 1
           end
-
-          puts "Reference integrity check passed: #{group_names.length} proxy groups, #{provider_names.length} rule providers, #{rules.length} rules."
           RUBY
 
   validate-mihomo:
