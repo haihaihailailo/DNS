@@ -161,10 +161,6 @@ proxy-groups: #!replace
     type: select
     proxies: [REJECT, DIRECT]
 
-  - name: 全局直连
-    type: select
-    proxies: [DIRECT]
-
   - name: 全部节点
     type: select
     include-all: true

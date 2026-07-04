@@ -202,7 +202,7 @@ proxy-groups:
   # 越南服务：优先越南节点，第二位 DIRECT；兼顾越南本地服务可用性和直连场景。
   - name: 越南服务
     type: select
-    proxies: [越南-自动, DIRECT, 越南节点, 新加坡-自动, 新加坡节点, 节点选择]
+    proxies: [越南-自动, DIRECT, 越南节点, 新加坡-自动, 新加坡节点, 香港-自动, 香港节点, 节点选择]
     url: "https://zalo.me"
     expected-status: 200/301/302
     interval: 300
@@ -337,16 +337,6 @@ proxy-groups:
     expected-status: 204
     interval: 300
     icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/bug.svg"
-
-
-  # 全局直连：只包含 DIRECT，用于需要强制直连的场景。
-  - name: 全局直连
-    type: select
-    proxies: [DIRECT]
-    url: "https://www.baidu.com"
-    expected-status: 200/302
-    interval: 300
-    icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/link.svg"
 
 
   # 全部节点：展示所有可用节点，便于临时手选。
