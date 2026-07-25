@@ -56,11 +56,8 @@ jobs:
           require "open3"
           require "yaml"
 
-          yaml_file = "防DNS泄露.yaml"
-          js_file = "防DNS泄露.js"
-          keys_to_compare = %w[unified-delay profile geo-auto-update geo-update-interval tcp-concurrent sniffer tun dns proxy-groups rule-providers rules]
-
-          yaml_config = YAML.safe_load_file(yaml_file, aliases: true)
+          keys = %w[unified-delay profile geo-auto-update geo-update-interval tcp-concurrent sniffer tun dns proxy-groups rule-providers rules]
+          yaml_config = YAML.safe_load_file("防DNS泄露.yaml", aliases: true)
 
           node_code = <<~'NODE'
             const fs = require("fs");
@@ -73,68 +70,35 @@ jobs:
             process.stdout.write(JSON.stringify(result));
           NODE
 
-          stdout, stderr, status = Open3.capture3("node", "-e", node_code, js_file)
+          stdout, stderr, status = Open3.capture3("node", "-e", node_code, "防DNS泄露.js")
           unless status.success?
             warn stderr
-            abort "Failed to evaluate #{js_file}"
+            abort "Failed to evaluate 防DNS泄露.js"
           end
           js_config = JSON.parse(stdout)
 
-          def pick(hash, keys)
-            keys.to_h { |key| [key, hash[key]] }
-          end
-
-          def normalize(value, path = [])
+          normalize = lambda do |value, path = []|
             case value
             when Hash
               value.keys.sort.to_h do |key|
-                key_string = key.to_s
-                [key, normalize(value[key], path + [key_string])]
+                [key, normalize.call(value[key], path + [key.to_s])]
               end
             when Array
-              normalized = value.map { |item| normalize(item, path) }
+              normalized = value.map { |item| normalize.call(item, path) }
               path.last == "ports" ? normalized.map(&:to_s) : normalized
             else
               path.last == "expected-status" ? value.to_s : value
             end
           end
 
-          def first_diff(a, b, path = "$")
-            return nil if a == b
-            return "#{path}: class #{a.class} != #{b.class}" unless a.class == b.class
+          yaml_selected = normalize.call(keys.to_h { |key| [key, yaml_config[key]] })
+          js_selected = normalize.call(keys.to_h { |key| [key, js_config[key]] })
 
-            case a
-            when Hash
-              a_keys = a.keys.sort
-              b_keys = b.keys.sort
-              return "#{path}: keys #{a_keys.inspect} != #{b_keys.inspect}" unless a_keys == b_keys
-              a_keys.each do |key|
-                diff = first_diff(a[key], b[key], "#{path}.#{key}")
-                return diff if diff
-              end
-            when Array
-              return "#{path}: length #{a.length} != #{b.length}" unless a.length == b.length
-              a.each_index do |index|
-                diff = first_diff(a[index], b[index], "#{path}[#{index}]")
-                return diff if diff
-              end
-            else
-              return "#{path}: #{a.inspect} != #{b.inspect}"
-            end
-
-            "#{path}: values differ"
-          end
-
-          yaml_selected = normalize(pick(yaml_config, keys_to_compare))
-          js_selected = normalize(pick(js_config, keys_to_compare))
-
-          if yaml_selected != js_selected
-            puts "YAML and JS full config sync check failed."
-            puts first_diff(yaml_selected, js_selected)
+          unless yaml_selected == js_selected
+            warn "YAML and JS full config are not synchronized."
             exit 1
           end
-
-          puts "YAML and JS full config are synchronized for: #{keys_to_compare.join(', ')}."
+          puts "YAML and JS full config are synchronized for: #{keys.join(', ')}."
           RUBY
 
       - name: Check rule references
@@ -155,11 +119,12 @@ jobs:
             valid_policies = group_names + built_in_policies
             errors = []
 
-            duplicate_groups = group_names.group_by(&:itself).select { |_name, values| values.length > 1 }.keys
-            duplicate_groups.each { |name| errors << "Duplicate proxy group: #{name}" }
-
-            duplicate_rules = rules.group_by(&:itself).select { |_rule, values| values.length > 1 }.keys
-            duplicate_rules.each { |rule| errors << "Duplicate rule: #{rule}" }
+            group_names.group_by(&:itself).each do |name, values|
+              errors << "Duplicate proxy group: #{name}" if values.length > 1
+            end
+            rules.group_by(&:itself).each do |rule, values|
+              errors << "Duplicate rule: #{rule}" if values.length > 1
+            end
 
             groups.each do |group|
               Array(group["proxies"]).each do |proxy|
@@ -171,7 +136,6 @@ jobs:
             rules.each_with_index do |rule, index|
               parts = rule.split(",").map(&:strip)
               type = parts[0]
-
               if type == "RULE-SET"
                 provider = parts[1]
                 policy = parts[2]
@@ -242,9 +206,7 @@ jobs:
           rules = Array(main["rules"])
           ad_index = rules.index("RULE-SET,reject,广告过滤")
           first_service_index = rules.index { |rule| rule.to_s.start_with?("PROCESS-NAME,") }
-          unless ad_index && first_service_index && ad_index < first_service_index
-            errors << "ad rule must appear before service rules"
-          end
+          errors << "ad rule must appear before service rules" unless ad_index && first_service_index && ad_index < first_service_index
 
           Hash(main["rule-providers"] || {}).each do |name, provider|
             errors << "rule-provider #{name} must download through 节点选择" unless provider["proxy"] == "节点选择"
@@ -254,8 +216,7 @@ jobs:
           errors << "Stash top-level IPv6 must follow client settings" if stash.key?("ipv6")
           errors << "Stash dns.ipv6 must follow client settings" if stash_dns.key?("ipv6")
           Hash(stash["rule-providers"] || {}).each do |name, provider|
-            url = provider["url"].to_s
-            errors << "Stash rule-provider #{name} still uses GitHub Raw" if url.include?("raw.githubusercontent.com")
+            errors << "Stash rule-provider #{name} still uses GitHub Raw" if provider["url"].to_s.include?("raw.githubusercontent.com")
           end
 
           country_codes = {
@@ -310,5 +271,4 @@ jobs:
           ./mihomo -v
 
       - name: Test config load
-        run: |
-          ./mihomo -t -f "防DNS泄露.yaml"
+        run: ./mihomo -t -f "防DNS泄露.yaml"
