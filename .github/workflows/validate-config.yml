@@ -40,48 +40,42 @@ jobs:
           abort stderr unless status.success?
           js_config = JSON.parse(stdout)
 
-          normalize = lambda do |value, path = []|
+          def normalize(value, path = [])
             case value
             when Hash
-              value.keys.sort.to_h { |key| [key, normalize.call(value[key], path + [key.to_s])] }
+              value.keys.sort.to_h { |key| [key, normalize(value[key], path + [key.to_s])] }
             when Array
-              values = value.map { |item| normalize.call(item, path) }
+              values = value.map { |item| normalize(item, path) }
               path.last == "ports" ? values.map(&:to_s) : values
             else
               path.last == "expected-status" ? value.to_s : value
             end
           end
 
-          yaml_selected = normalize.call(keys.to_h { |key| [key, yaml_config[key]] })
-          js_selected = normalize.call(keys.to_h { |key| [key, js_config[key]] })
-
-          first_diff = lambda do |a, b, path = "$"|
-            if a.class != b.class
-              "#{path}: class #{a.class} != #{b.class}"
-            elsif a.is_a?(Hash)
-              if a.keys != b.keys
-                "#{path}: keys #{a.keys.inspect} != #{b.keys.inspect}"
-              else
-                a.keys.each do |key|
-                  found = first_diff.call(a[key], b[key], "#{path}.#{key}")
-                  break found if found
-                end
+          def first_diff(a, b, path = "$")
+            return "#{path}: class #{a.class} != #{b.class}" unless a.class == b.class
+            if a.is_a?(Hash)
+              return "#{path}: keys #{a.keys.inspect} != #{b.keys.inspect}" unless a.keys == b.keys
+              a.each_key do |key|
+                diff = first_diff(a[key], b[key], "#{path}.#{key}")
+                return diff if diff
               end
             elsif a.is_a?(Array)
-              if a.length != b.length
-                "#{path}: length #{a.length} != #{b.length}"
-              else
-                a.each_index do |index|
-                  found = first_diff.call(a[index], b[index], "#{path}[#{index}]")
-                  break found if found
-                end
+              return "#{path}: length #{a.length} != #{b.length}" unless a.length == b.length
+              a.each_index do |index|
+                diff = first_diff(a[index], b[index], "#{path}[#{index}]")
+                return diff if diff
               end
             elsif a != b
-              "#{path}: #{a.inspect} != #{b.inspect}"
+              return "#{path}: #{a.inspect} != #{b.inspect}"
             end
+            nil
           end
 
-          diff = first_diff.call(yaml_selected, js_selected) || "MATCH"
+          yaml_selected = normalize(keys.to_h { |key| [key, yaml_config[key]] })
+          js_selected = normalize(keys.to_h { |key| [key, js_config[key]] })
+          diff = first_diff(yaml_selected, js_selected) || "MATCH"
+
           File.write("sync-diff.txt", diff + "\n")
           File.write("yaml-selected.json", JSON.pretty_generate(yaml_selected))
           File.write("js-selected.json", JSON.pretty_generate(js_selected))
