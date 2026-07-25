@@ -14,7 +14,7 @@ on:
       - "stash.stoverride"
       - ".github/workflows/validate-config.yml"
   schedule:
-    # 每周一 04:30 新加坡时间自动校验一次，提前发现 mihomo/远程规则/下载链路变化。
+    # 每周一 04:30 新加坡时间自动校验一次，提前发现 Mihomo、远程规则或下载链路变化。
     - cron: "30 20 * * 0"
   workflow_dispatch:
 
@@ -48,92 +48,52 @@ jobs:
           node --version
           node --check "防DNS泄露.js"
 
+      # JavaScript from an external fork must never be evaluated with the base repository workflow context.
       - name: Compare YAML and JS full config
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         run: |
           ruby <<'RUBY'
           require "json"
           require "open3"
           require "yaml"
 
-          yaml_file = "防DNS泄露.yaml"
-          js_file = "防DNS泄露.js"
-          keys_to_compare = %w[unified-delay profile geo-auto-update geo-update-interval tcp-concurrent sniffer tun dns proxy-groups rule-providers rules]
-
-          yaml_config = YAML.safe_load_file(yaml_file, aliases: true)
+          keys = %w[unified-delay profile geo-auto-update geo-update-interval tcp-concurrent sniffer tun dns proxy-groups rule-providers rules]
+          yaml_config = YAML.safe_load_file("防DNS泄露.yaml", aliases: true)
 
           node_code = <<~'NODE'
             const fs = require("fs");
             const vm = require("vm");
-            const file = process.argv[process.argv.length - 1];
-            const code = fs.readFileSync(file, "utf8");
+            const code = fs.readFileSync("防DNS泄露.js", "utf8");
             const sandbox = { console };
             vm.createContext(sandbox);
-            const result = vm.runInContext(`${code}\n;main({});`, sandbox, { filename: file });
+            const result = vm.runInContext(`${code}\n;main({});`, sandbox, { filename: "防DNS泄露.js" });
             process.stdout.write(JSON.stringify(result));
           NODE
 
-          stdout, stderr, status = Open3.capture3("node", "-e", node_code, js_file)
+          stdout, stderr, status = Open3.capture3("node", "-e", node_code)
           unless status.success?
             warn stderr
-            abort "Failed to evaluate #{js_file}"
+            abort "Failed to evaluate 防DNS泄露.js"
           end
           js_config = JSON.parse(stdout)
 
-          def pick(hash, keys)
-            keys.to_h { |key| [key, hash[key]] }
-          end
-
-          def normalize(value, path = [])
+          normalize = lambda do |value, path = []|
             case value
             when Hash
-              value.keys.sort.to_h do |key|
-                key_string = key.to_s
-                [key, normalize(value[key], path + [key_string])]
-              end
+              value.keys.sort.to_h { |key| [key, normalize.call(value[key], path + [key.to_s])] }
             when Array
-              normalized = value.map { |item| normalize(item, path) }
-              path.last == "ports" ? normalized.map(&:to_s) : normalized
+              values = value.map { |item| normalize.call(item, path) }
+              path.last == "ports" ? values.map(&:to_s) : values
             else
               path.last == "expected-status" ? value.to_s : value
             end
           end
 
-          def first_diff(a, b, path = "$")
-            return nil if a == b
-            return "#{path}: class #{a.class} != #{b.class}" unless a.class == b.class
+          yaml_selected = normalize.call(keys.to_h { |key| [key, yaml_config[key]] })
+          js_selected = normalize.call(keys.to_h { |key| [key, js_config[key]] })
+          abort "YAML and JS full config are not synchronized" unless yaml_selected == js_selected
 
-            case a
-            when Hash
-              a_keys = a.keys.sort
-              b_keys = b.keys.sort
-              return "#{path}: keys #{a_keys.inspect} != #{b_keys.inspect}" unless a_keys == b_keys
-              a_keys.each do |key|
-                diff = first_diff(a[key], b[key], "#{path}.#{key}")
-                return diff if diff
-              end
-            when Array
-              return "#{path}: length #{a.length} != #{b.length}" unless a.length == b.length
-              a.each_index do |index|
-                diff = first_diff(a[index], b[index], "#{path}[#{index}]")
-                return diff if diff
-              end
-            else
-              return "#{path}: #{a.inspect} != #{b.inspect}"
-            end
-
-            "#{path}: values differ"
-          end
-
-          yaml_selected = normalize(pick(yaml_config, keys_to_compare))
-          js_selected = normalize(pick(js_config, keys_to_compare))
-
-          if yaml_selected != js_selected
-            puts "YAML and JS full config sync check failed."
-            puts first_diff(yaml_selected, js_selected)
-            exit 1
-          end
-
-          puts "YAML and JS full config are synchronized for: #{keys_to_compare.join(', ')}."
+          puts "YAML and JS full config are synchronized for: #{keys.join(', ')}."
           RUBY
 
       - name: Check rule references
@@ -141,74 +101,148 @@ jobs:
           ruby <<'RUBY'
           require "yaml"
 
-          files_to_check = ["防DNS泄露.yaml", "stash.stoverride"]
-          built_in_policies = %w[DIRECT REJECT REJECT-DROP REJECT-TINYGIF PASS COMPATIBLE]
+          files = ["防DNS泄露.yaml", "stash.stoverride"]
+          built_in = %w[DIRECT REJECT REJECT-DROP REJECT-TINYGIF PASS COMPATIBLE]
           all_errors = []
 
-          files_to_check.each do |file|
+          files.each do |file|
             config = YAML.safe_load_file(file, aliases: true)
             groups = Array(config["proxy-groups"])
             group_names = groups.map { |group| group["name"] }.compact
-            provider_names = Hash(config["rule-providers"] || {}).keys
+            providers = Hash(config["rule-providers"] || {})
             rules = Array(config["rules"]).map { |rule| rule.to_s.strip }.reject(&:empty?)
-            valid_policies = group_names + built_in_policies
+            policies = group_names + built_in
             errors = []
 
-            duplicate_groups = group_names.group_by(&:itself).select { |_name, values| values.length > 1 }.keys
-            duplicate_groups.each { |name| errors << "Duplicate proxy group: #{name}" }
-
-            duplicate_rules = rules.group_by(&:itself).select { |_rule, values| values.length > 1 }.keys
-            duplicate_rules.each { |rule| errors << "Duplicate rule: #{rule}" }
+            group_names.group_by(&:itself).each { |name, values| errors << "Duplicate proxy group: #{name}" if values.length > 1 }
+            rules.group_by(&:itself).each { |rule, values| errors << "Duplicate rule: #{rule}" if values.length > 1 }
 
             groups.each do |group|
               Array(group["proxies"]).each do |proxy|
-                next if valid_policies.include?(proxy)
-                errors << "Proxy group #{group['name']} references unknown proxy/group: #{proxy}"
+                errors << "Proxy group #{group['name']} references unknown proxy/group: #{proxy}" unless policies.include?(proxy)
               end
             end
 
             rules.each_with_index do |rule, index|
               parts = rule.split(",").map(&:strip)
               type = parts[0]
-
               if type == "RULE-SET"
-                provider = parts[1]
-                policy = parts[2]
-                errors << "Rule ##{index + 1} references unknown rule-provider: #{provider}" unless provider_names.include?(provider)
-                errors << "Rule ##{index + 1} references unknown policy: #{policy}" unless valid_policies.include?(policy)
+                errors << "Rule ##{index + 1} references unknown rule-provider: #{parts[1]}" unless providers.key?(parts[1])
+                errors << "Rule ##{index + 1} references unknown policy: #{parts[2]}" unless policies.include?(parts[2])
               elsif type == "MATCH"
-                policy = parts[1]
-                errors << "Rule ##{index + 1} references unknown policy: #{policy}" unless valid_policies.include?(policy)
+                errors << "Rule ##{index + 1} references unknown policy: #{parts[1]}" unless policies.include?(parts[1])
               else
                 policy = parts[2]
                 errors << "Rule ##{index + 1} is too short: #{rule}" if policy.nil? || policy.empty?
-                errors << "Rule ##{index + 1} references unknown policy: #{policy}" if policy && !valid_policies.include?(policy)
+                errors << "Rule ##{index + 1} references unknown policy: #{policy}" if policy && !policies.include?(policy)
               end
             end
 
             Hash(config.dig("dns", "nameserver-policy") || {}).each_key do |key|
               next unless key.to_s.start_with?("rule-set:")
               provider = key.to_s.sub(/^rule-set:/, "")
-              errors << "dns.nameserver-policy references unknown rule-provider: #{provider}" unless provider_names.include?(provider)
+              errors << "dns.nameserver-policy references unknown rule-provider: #{provider}" unless providers.key?(provider)
             end
 
-            if errors.any?
+            if errors.empty?
+              puts "#{file} reference integrity passed: #{group_names.length} proxy groups, #{providers.length} rule providers, #{rules.length} rules."
+            else
               all_errors << "#{file}:"
               errors.each { |error| all_errors << "- #{error}" }
-            else
-              puts "#{file} reference integrity passed: #{group_names.length} proxy groups, #{provider_names.length} rule providers, #{rules.length} rules."
             end
           end
 
-          if all_errors.any?
-            puts "Reference integrity check failed:"
-            puts all_errors
+          unless all_errors.empty?
+            warn "Reference integrity check failed:"
+            warn all_errors.join("\n")
             exit 1
           end
           RUBY
 
+      - name: Check policy semantics
+        run: |
+          ruby <<'RUBY'
+          require "ipaddr"
+          require "uri"
+          require "yaml"
+
+          main = YAML.safe_load_file("防DNS泄露.yaml", aliases: true)
+          stash = YAML.safe_load_file("stash.stoverride", aliases: true)
+          errors = []
+
+          encrypted_ip_resolver = lambda do |value|
+            uri = URI.parse(value.to_s)
+            %w[https tls].include?(uri.scheme) && uri.host && IPAddr.new(uri.host)
+          rescue URI::InvalidURIError, IPAddr::InvalidAddressError
+            false
+          end
+
+          encrypted_resolver = lambda do |value|
+            uri = URI.parse(value.to_s)
+            %w[https tls].include?(uri.scheme) && !uri.host.to_s.empty?
+          rescue URI::InvalidURIError
+            false
+          end
+
+          dns = Hash(main["dns"] || {})
+          tun = Hash(main["tun"] || {})
+          bootstrap = Array(dns["default-nameserver"])
+          direct_dns = Array(dns["direct-nameserver"])
+
+          errors << "main default-nameserver must use encrypted IP-based resolvers" unless bootstrap.any? && bootstrap.all? { |item| encrypted_ip_resolver.call(item) }
+          errors << "main direct-nameserver must use encrypted resolvers" unless direct_dns.any? && direct_dns.all? { |item| encrypted_resolver.call(item) }
+          errors << "direct-nameserver-follow-policy must be true" unless dns["direct-nameserver-follow-policy"] == true
+
+          # IPv6 is intentionally inherited from the client/software instead of being forced by the override.
+          errors << "top-level IPv6 must follow client settings" if main.key?("ipv6")
+          errors << "dns.ipv6 must follow client settings" if dns.key?("ipv6")
+          errors << "fake-ip-range6 must follow client settings" if dns.key?("fake-ip-range6")
+          errors << "tun.inet6-address must follow client settings" if tun.key?("inet6-address")
+
+          groups = Array(main["proxy-groups"]).to_h { |group| [group["name"], group] }
+          errors << "Vietnam policy must default to DIRECT" unless Array(groups.dig("越南服务", "proxies")).first == "DIRECT"
+          errors << "AI policy must prefer an automatic group" unless Array(groups.dig("AI", "proxies")).first.to_s.end_with?("-自动")
+
+          rules = Array(main["rules"])
+          ad_index = rules.index("RULE-SET,reject,广告过滤")
+          first_service_index = rules.index { |rule| rule.to_s.start_with?("PROCESS-NAME,") }
+          errors << "ad rule must appear before service rules" unless ad_index && first_service_index && ad_index < first_service_index
+
+          Hash(main["rule-providers"] || {}).each do |name, provider|
+            errors << "rule-provider #{name} must download through 节点选择" unless provider["proxy"] == "节点选择"
+          end
+
+          stash_dns = Hash(stash["dns"] || {})
+          errors << "Stash top-level IPv6 must follow client settings" if stash.key?("ipv6")
+          errors << "Stash dns.ipv6 must follow client settings" if stash_dns.key?("ipv6")
+          Hash(stash["rule-providers"] || {}).each do |name, provider|
+            errors << "Stash rule-provider #{name} still uses GitHub Raw" if provider["url"].to_s.include?("raw.githubusercontent.com")
+          end
+
+          country_codes = {
+            "香港" => "HK", "台湾" => "TW", "日本" => "JP", "新加坡" => "SG",
+            "美国" => "US", "韩国" => "KR", "越南" => "VN", "中国" => "CN"
+          }
+          [main, stash].each do |config|
+            group_map = Array(config["proxy-groups"]).to_h { |group| [group["name"], group] }
+            country_codes.each do |region, code|
+              ["#{region}节点", "#{region}-自动"].each do |name|
+                filter = group_map.dig(name, "filter").to_s
+                boundary = "(^|[^A-Z])#{code}([^A-Z]|$)"
+                errors << "#{name} filter lacks a bounded #{code} token" unless filter.include?(boundary)
+              end
+            end
+          end
+
+          unless errors.empty?
+            warn errors.map { |error| "- #{error}" }.join("\n")
+            exit 1
+          end
+          puts "Policy semantic checks passed."
+          RUBY
+
   validate-mihomo:
-    name: Load config with mihomo
+    name: Load config with Mihomo
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: validate-sources
@@ -216,7 +250,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Download mihomo
+      - name: Download latest Mihomo
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -228,7 +262,7 @@ jobs:
             https://api.github.com/repos/MetaCubeX/mihomo/releases/latest)"
           url="$(echo "$release_json" | jq -r '.assets[] | select(.name | test("^mihomo-linux-amd64-v1-v.*\\.gz$")) | .browser_download_url' | head -n 1)"
           if [ -z "$url" ]; then
-            echo "No linux amd64 v1 mihomo asset found" >&2
+            echo "No linux amd64 v1 Mihomo asset found" >&2
             exit 1
           fi
           curl --retry 3 --retry-delay 2 --retry-connrefused -fsSL "$url" -o mihomo.gz
@@ -237,5 +271,4 @@ jobs:
           ./mihomo -v
 
       - name: Test config load
-        run: |
-          ./mihomo -t -f "防DNS泄露.yaml"
+        run: ./mihomo -t -f "防DNS泄露.yaml"
