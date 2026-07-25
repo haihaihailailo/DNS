@@ -1,4 +1,4 @@
-name: Diagnose config synchronization
+name: Patch missing JS rule providers
 
 on:
   pull_request:
@@ -7,87 +7,85 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
+  patch:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'agent/fix-mihomo-config'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
 
-      - name: Build synchronization diagnostic
+      - name: Add missing JavaScript rule providers
         run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path("防DNS泄露.js")
+          text = path.read_text(encoding="utf-8")
+          providers = '''  twitter: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.mrs", path: "./ruleset/metacubex/twitter.mrs" },
+            facebook: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs", path: "./ruleset/metacubex/facebook.mrs" },
+            steam: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs", path: "./ruleset/metacubex/steam.mrs" },
+            "category-games": { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.mrs", path: "./ruleset/metacubex/category-games.mrs" },
+          '''
+          providers = "\n".join(line.lstrip() if i == 0 else "  " + line.lstrip() for i, line in enumerate(providers.splitlines())) + "\n"
+          anchor = '  telegramcidr: { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400, proxy: "节点选择", url:'
+          if '  twitter: { ...META_DOMAIN_PROVIDER' not in text:
+              if anchor not in text:
+                  raise SystemExit("telegramcidr provider anchor not found")
+              text = text.replace(anchor, providers + anchor, 1)
+          for name in ["twitter", "facebook", "steam", "category-games"]:
+              if name not in text:
+                  raise SystemExit(f"missing provider after patch: {name}")
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Validate JavaScript syntax and YAML sync
+        run: |
+          node --check "防DNS泄露.js"
           ruby <<'RUBY'
           require "json"
           require "open3"
           require "yaml"
-
           keys = %w[unified-delay profile geo-auto-update geo-update-interval tcp-concurrent sniffer tun dns proxy-groups rule-providers rules]
           yaml_config = YAML.safe_load_file("防DNS泄露.yaml", aliases: true)
-
           node_code = <<~'NODE'
             const fs = require("fs");
             const vm = require("vm");
-            const file = process.argv[process.argv.length - 1];
-            const code = fs.readFileSync(file, "utf8");
+            const code = fs.readFileSync("防DNS泄露.js", "utf8");
             const sandbox = { console };
             vm.createContext(sandbox);
-            const result = vm.runInContext(`${code}\n;main({});`, sandbox, { filename: file });
-            process.stdout.write(JSON.stringify(result));
+            process.stdout.write(JSON.stringify(vm.runInContext(`${code}\n;main({});`, sandbox)));
           NODE
-          stdout, stderr, status = Open3.capture3("node", "-e", node_code, "防DNS泄露.js")
+          stdout, stderr, status = Open3.capture3("node", "-e", node_code)
           abort stderr unless status.success?
           js_config = JSON.parse(stdout)
-
-          def normalize(value, path = [])
+          normalize = lambda do |value, path = []|
             case value
             when Hash
-              value.keys.sort.to_h { |key| [key, normalize(value[key], path + [key.to_s])] }
+              value.keys.sort.to_h { |key| [key, normalize.call(value[key], path + [key.to_s])] }
             when Array
-              values = value.map { |item| normalize(item, path) }
+              values = value.map { |item| normalize.call(item, path) }
               path.last == "ports" ? values.map(&:to_s) : values
             else
               path.last == "expected-status" ? value.to_s : value
             end
           end
-
-          def first_diff(a, b, path = "$")
-            return "#{path}: class #{a.class} != #{b.class}" unless a.class == b.class
-            if a.is_a?(Hash)
-              return "#{path}: keys #{a.keys.inspect} != #{b.keys.inspect}" unless a.keys == b.keys
-              a.each_key do |key|
-                diff = first_diff(a[key], b[key], "#{path}.#{key}")
-                return diff if diff
-              end
-            elsif a.is_a?(Array)
-              return "#{path}: length #{a.length} != #{b.length}" unless a.length == b.length
-              a.each_index do |index|
-                diff = first_diff(a[index], b[index], "#{path}[#{index}]")
-                return diff if diff
-              end
-            elsif a != b
-              return "#{path}: #{a.inspect} != #{b.inspect}"
-            end
-            nil
-          end
-
-          yaml_selected = normalize(keys.to_h { |key| [key, yaml_config[key]] })
-          js_selected = normalize(keys.to_h { |key| [key, js_config[key]] })
-          diff = first_diff(yaml_selected, js_selected) || "MATCH"
-
-          File.write("sync-diff.txt", diff + "\n")
-          File.write("yaml-selected.json", JSON.pretty_generate(yaml_selected))
-          File.write("js-selected.json", JSON.pretty_generate(js_selected))
-          puts diff
+          yaml_selected = normalize.call(keys.to_h { |key| [key, yaml_config[key]] })
+          js_selected = normalize.call(keys.to_h { |key| [key, js_config[key]] })
+          abort "YAML and JS are still not synchronized" unless yaml_selected == js_selected
+          puts "YAML and JS are synchronized."
           RUBY
 
-      - name: Upload diagnostic
-        uses: actions/upload-artifact@v4
-        with:
-          name: config-sync-diagnostic
-          path: |
-            sync-diff.txt
-            yaml-selected.json
-            js-selected.json
-          retention-days: 1
+      - name: Commit JavaScript provider fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 防DNS泄露.js
+          git commit -m "fix: synchronize JavaScript rule providers"
+          git push origin HEAD:agent/fix-mihomo-config
