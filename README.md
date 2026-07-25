@@ -10,8 +10,8 @@
 
 ## 功能
 
-- DNS 防泄露：启用 `respect-rules`，按规则分流 DNS 请求。
-- IPv6：各版本均保持 IPv6 开启，适合需要 IPv6 可用性的网络环境。
+- DNS 防泄露：启用 `respect-rules`，按规则分流 DNS 请求；Mihomo 主配置使用加密启动 DNS，并让直连 DNS 遵循策略。
+- IPv6：覆写不强制开启或关闭 IPv6，跟随客户端/软件自身设置。
 - fake-ip：显式使用 `fake-ip-filter-mode: blacklist`，对局域网、路由器、NTP、推送等域名返回真实 IP，降低局域网和系统服务异常概率。
 - TUN 接管：主配置启用 TUN DNS 劫持，并绕过局域网地址、微信、支付宝等关键国内应用。
 - Stash 适配：提供 `stash.stoverride`，保留 DNS、Sniffer、策略组、规则集和分流规则。
@@ -49,11 +49,11 @@
 
 ## 使用注意
 
-- 本配置默认启用 fake-ip 和 IPv6；主配置还启用 TUN DNS 劫持，建议先备份原客户端配置。
+- 本配置默认启用 fake-ip；IPv6 跟随客户端/软件设置。主配置包含 TUN DNS 劫持参数，建议先备份原客户端配置。
 - Android 场景下，微信和支付宝已通过 `tun.exclude-package` 绕过 TUN，减少支付、小程序、扫码登录异常。
 - Stash 版本不建议直接照搬主配置的 `tun` 段，应交给客户端管理隧道。
 - 国内服务、系统更新、局域网、NTP、推送等规则优先直连，避免误入代理导致加载异常。
-- 越南服务独立分组，适合 Zalo、Grab、Shopee 越南、越南航空/票务/本地站点等场景。
+- 越南服务独立分组并默认 DIRECT，适合在越南本地网络访问 Zalo、Grab、Shopee 越南、航空/票务和本地站点。
 - `midea` 相关域名固定直连，避免客户/工作相关系统误走代理。
 - 如修改策略组名称，必须同步修改 `rules`、`nameserver-policy`、JS 覆写版本和 Stash 覆写版本。
 
@@ -61,7 +61,7 @@
 
 - `防DNS泄露.yaml` 是主配置。
 - `防DNS泄露.js` 与主 YAML 保持功能同步。
-- `stash.stoverride` 是 Stash 专用版本，保留 DNS、Sniffer、策略组、规则集和规则分流，并保持 IPv6 开启。
+- `stash.stoverride` 是 Stash 专用版本，保留 DNS、Sniffer、策略组、规则集和规则分流；IPv6 跟随 Stash 自身设置。
 - 以后修改主配置时，需要同步检查 JS 和 Stash 两类覆写文件。
 - CI 会自动校验主 YAML 解析、主 JS 语法、主 YAML/JS 关键配置同步、规则引用完整性、Stash 覆写解析和 mihomo 加载测试。
 - CI 会检查 `unified-delay`、`profile`、`geo-auto-update`、`geo-update-interval`、`tcp-concurrent`、`sniffer`、`tun`、`dns`、`proxy-groups`、`rule-providers`、`rules` 是否在主 YAML 和主 JS 中保持一致。
