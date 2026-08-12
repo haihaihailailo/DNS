@@ -1,0 +1,33 @@
+name: Validate health-check topology
+
+on:
+  push:
+    paths:
+      - "防DNS泄露.yaml"
+      - "防DNS泄露.js"
+      - "stash.stoverride"
+      - ".github/scripts/validate_health_checks.py"
+      - ".github/workflows/validate-health-checks.yml"
+  pull_request:
+    paths:
+      - "防DNS泄露.yaml"
+      - "防DNS泄露.js"
+      - "stash.stoverride"
+      - ".github/scripts/validate_health_checks.py"
+      - ".github/workflows/validate-health-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Reject recursive or duplicate health checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate proxy-group health-check topology
+        run: python3 .github/scripts/validate_health_checks.py

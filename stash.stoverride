@@ -178,7 +178,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://www.gstatic.com/generate_204
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: false
     filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP|回国|中国|CN|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)).*$"
 
   - name: 香港节点
@@ -191,7 +193,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://www.google.com.hk/generate_204
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: true
     filter: "(?i)(广港|香港|Hong ?Kong|HKG|🇭🇰|(^|[^A-Z])HK([^A-Z]|$))"
 
   - name: 台湾节点
@@ -204,7 +208,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://www.google.com.tw/generate_204
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: true
     filter: "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|TWN|🇹🇼|(^|[^A-Z])TW([^A-Z]|$))"
 
   - name: 日本节点
@@ -217,7 +223,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://www.google.co.jp/generate_204
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: true
     filter: "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$))"
 
   - name: 新加坡节点
@@ -230,7 +238,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://www.google.com.sg/generate_204
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: true
     filter: "(?i)(广新|新加坡|坡|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$))"
 
   - name: 美国节点
@@ -243,7 +253,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://www.google.com/generate_204
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: true
     filter: "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United States|USA|🇺🇸|(^|[^A-Z])US([^A-Z]|$))"
 
   - name: 韩国节点
@@ -256,7 +268,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://www.google.co.kr/generate_204
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: true
     filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))"
 
   - name: 越南节点
@@ -269,7 +283,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://zalo.me
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: true
     filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|HCM|🇻🇳|(^|[^A-Z])VN([^A-Z]|$))"
 
   - name: 中国节点
@@ -282,7 +298,9 @@ proxy-groups: #!replace
     include-all: true
     interval: 300
     tolerance: 50
-    url: https://www.baidu.com
+    url: https://1.1.1.1/cdn-cgi/trace
+    timeout: 10000
+    lazy: true
     filter: "(?i)(广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
 
 rule-providers: #!replace
