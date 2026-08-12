@@ -98,80 +98,99 @@ sniffer: #!replace
 proxy-groups: #!replace
   - name: 节点选择
     type: select
+    interval: -1
     proxies: [自动选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, 中国-自动, 中国节点, 全部节点, DIRECT]
 
   - name: 漏网之鱼
     type: select
+    interval: -1
     proxies: [节点选择, 自动选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, 中国-自动, 中国节点, DIRECT, 全部节点]
 
   - name: 越南服务
     type: select
+    interval: -1
     proxies: [DIRECT, 越南-自动, 越南节点, 新加坡-自动, 新加坡节点, 香港-自动, 香港节点, 节点选择]
 
   - name: 国内服务
     type: select
+    interval: -1
     proxies: [DIRECT, 中国-自动, 中国节点, 香港-自动, 香港节点, 节点选择]
 
   - name: GitHub
     type: select
+    interval: -1
     proxies: [香港-自动, 新加坡-自动, 日本-自动, 美国-自动, 香港节点, 新加坡节点, 日本节点, 美国节点, 节点选择, DIRECT]
 
   - name: YouTube
     type: select
+    interval: -1
     proxies: [节点选择, 自动选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, DIRECT]
 
   - name: Netflix
     type: select
+    interval: -1
     proxies: [节点选择, 自动选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, DIRECT]
 
   - name: AI
     type: select
+    interval: -1
     proxies: [美国-自动, 日本-自动, 新加坡-自动, 香港-自动, 美国节点, 日本节点, 新加坡节点, 香港节点, 节点选择, DIRECT]
 
   - name: 谷歌服务
     type: select
+    interval: -1
     proxies: [节点选择, 新加坡节点, 日本节点, 香港节点, 美国节点, 新加坡-自动, 日本-自动, 香港-自动, 美国-自动, 自动选择, DIRECT]
 
   - name: 电报消息
     type: select
-    proxies: [新加坡-自动, 自动选择, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, DIRECT]
+    interval: -1
+    proxies: [自动选择, 新加坡-自动, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, DIRECT]
 
   - name: Meta / X
     type: select
+    interval: -1
     proxies: [节点选择, 自动选择, 新加坡-自动, 新加坡节点, 香港-自动, 香港节点, 日本-自动, 日本节点, 美国-自动, 美国节点, 台湾-自动, 台湾节点, DIRECT]
 
   - name: 游戏平台
     type: select
+    interval: -1
     proxies: [节点选择, DIRECT, 自动选择, 香港-自动, 香港节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点]
 
   - name: 微软服务
     type: select
+    interval: -1
     proxies: [DIRECT, 香港-自动, 新加坡-自动, 中国-自动, 香港节点, 新加坡节点, 中国节点, 美国-自动, 美国节点, 节点选择]
 
   - name: TikTok
     type: select
+    interval: -1
     proxies: [节点选择, 自动选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, DIRECT]
 
   - name: 苹果服务
     type: select
+    interval: -1
     proxies: [DIRECT, 自动选择, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, 中国-自动, 中国节点]
 
   - name: Spotify
     type: select
+    interval: -1
     proxies: [节点选择, 自动选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, DIRECT]
 
   - name: 哔哩哔哩港澳台
     type: select
+    interval: -1
     proxies: [DIRECT, 自动选择, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡-自动, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, 中国-自动, 中国节点]
 
   - name: 广告过滤
     type: select
+    interval: -1
     proxies: [REJECT, DIRECT]
 
   - name: 全部节点
     type: select
+    interval: -1
     include-all: true
-    filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP)).*$"
+    filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群)).*$"
 
   - name: 自动选择
     type: url-test
@@ -181,10 +200,11 @@ proxy-groups: #!replace
     url: https://1.1.1.1/cdn-cgi/trace
     timeout: 10000
     lazy: false
-    filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP|回国|中国|CN|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)).*$"
+    filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|中国|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)).*$"
 
   - name: 香港节点
     type: select
+    interval: -1
     include-all: true
     filter: "(?i)(广港|香港|Hong ?Kong|HKG|🇭🇰|(^|[^A-Z])HK([^A-Z]|$))"
 
@@ -200,6 +220,7 @@ proxy-groups: #!replace
 
   - name: 台湾节点
     type: select
+    interval: -1
     include-all: true
     filter: "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|TWN|🇹🇼|(^|[^A-Z])TW([^A-Z]|$))"
 
@@ -215,6 +236,7 @@ proxy-groups: #!replace
 
   - name: 日本节点
     type: select
+    interval: -1
     include-all: true
     filter: "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$))"
 
@@ -230,6 +252,7 @@ proxy-groups: #!replace
 
   - name: 新加坡节点
     type: select
+    interval: -1
     include-all: true
     filter: "(?i)(广新|新加坡|坡|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$))"
 
@@ -245,6 +268,7 @@ proxy-groups: #!replace
 
   - name: 美国节点
     type: select
+    interval: -1
     include-all: true
     filter: "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United States|USA|🇺🇸|(^|[^A-Z])US([^A-Z]|$))"
 
@@ -260,6 +284,7 @@ proxy-groups: #!replace
 
   - name: 韩国节点
     type: select
+    interval: -1
     include-all: true
     filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))"
 
@@ -275,6 +300,7 @@ proxy-groups: #!replace
 
   - name: 越南节点
     type: select
+    interval: -1
     include-all: true
     filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|HCM|🇻🇳|(^|[^A-Z])VN([^A-Z]|$))"
 
@@ -290,6 +316,7 @@ proxy-groups: #!replace
 
   - name: 中国节点
     type: select
+    interval: -1
     include-all: true
     filter: "(?i)(广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
 
@@ -516,17 +543,10 @@ rules: #!replace
   - DOMAIN-KEYWORD,midea,DIRECT
   - DOMAIN-SUFFIX,zalo.me,越南服务
   - DOMAIN-SUFFIX,zaloapp.com,越南服务
-  - DOMAIN-KEYWORD,zalo,越南服务
   - DOMAIN-SUFFIX,grab.com,越南服务
-  - DOMAIN-KEYWORD,grab,越南服务
   - DOMAIN-SUFFIX,gojek.com,越南服务
-  - DOMAIN-KEYWORD,gojek,越南服务
-  - DOMAIN-KEYWORD,tiki,越南服务
-  - DOMAIN-KEYWORD,zing,越南服务
   - DOMAIN-SUFFIX,nhaccuatui.com,越南服务
   - DOMAIN-SUFFIX,vnexpress.net,越南服务
-  - DOMAIN-KEYWORD,momo,越南服务
-  - DOMAIN-KEYWORD,zalopay,越南服务
   - DOMAIN-SUFFIX,vn,越南服务
   - DOMAIN-SUFFIX,baomoi.com,越南服务
   - DOMAIN-SUFFIX,thegioididong.com,越南服务
@@ -536,8 +556,6 @@ rules: #!replace
   - DOMAIN-SUFFIX,nguyenkim.com,越南服务
   - DOMAIN-SUFFIX,hoanghamobile.com,越南服务
   - DOMAIN-SUFFIX,ahamove.com,越南服务
-  - DOMAIN-KEYWORD,baemin,越南服务
-  - DOMAIN-KEYWORD,shopeefood,越南服务
   - DOMAIN-SUFFIX,fpt.net,越南服务
   - DOMAIN-SUFFIX,ghnexpress.com,越南服务
   - DOMAIN-SUFFIX,vietnamairlines.com,越南服务

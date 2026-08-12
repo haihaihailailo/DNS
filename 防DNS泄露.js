@@ -31,7 +31,7 @@ const URLTEST_BASE = {
   hidden: true,
   "include-all": true,
   timeout: 10000,
-  filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP|回国|中国|CN|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)).*$",
+  filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|中国|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)).*$",
   icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/speed.svg",
 };
 
@@ -209,7 +209,7 @@ OVERRIDE["proxy-groups"] = [
   { name: "Netflix", type: "select", proxies: ["节点选择", "自动选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "DIRECT"], icon: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/icon/netflix.svg" },
   { name: "AI", type: "select", proxies: ["美国-自动", "日本-自动", "新加坡-自动", "香港-自动", "美国节点", "日本节点", "新加坡节点", "香港节点", "节点选择", "DIRECT"], icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/chatgpt.svg" },
   { name: "谷歌服务", type: "select", proxies: ["节点选择", "新加坡节点", "日本节点", "香港节点", "美国节点", "新加坡-自动", "日本-自动", "香港-自动", "美国-自动", "自动选择", "DIRECT"], icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/google.svg" },
-  { name: "电报消息", type: "select", proxies: ["新加坡-自动", "自动选择", "节点选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "中国-自动", "中国节点", "DIRECT"], icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg" },
+  { name: "电报消息", type: "select", proxies: ["自动选择", "新加坡-自动", "节点选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "中国-自动", "中国节点", "DIRECT"], icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg" },
   { name: "Meta / X", type: "select", proxies: ["节点选择", "自动选择", "新加坡-自动", "新加坡节点", "香港-自动", "香港节点", "日本-自动", "日本节点", "美国-自动", "美国节点", "台湾-自动", "台湾节点", "DIRECT"], icon: "https://www.facebook.com/favicon.ico" },
   { name: "游戏平台", type: "select", proxies: ["节点选择", "DIRECT", "自动选择", "香港-自动", "香港节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点"], icon: "https://store.steampowered.com/favicon.ico" },
   { name: "微软服务", type: "select", proxies: ["DIRECT", "香港-自动", "新加坡-自动", "中国-自动", "香港节点", "新加坡节点", "中国节点", "美国-自动", "美国节点", "节点选择"], icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/microsoft.svg" },
@@ -218,7 +218,7 @@ OVERRIDE["proxy-groups"] = [
   { name: "Spotify", type: "select", proxies: ["节点选择", "自动选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "DIRECT"], icon: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/icon/spotify.svg" },
   { name: "哔哩哔哩港澳台", type: "select", proxies: ["DIRECT", "自动选择", "节点选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "中国-自动", "中国节点"], icon: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/icon/bilibili.svg" },
   { name: "广告过滤", type: "select", proxies: ["REJECT", "DIRECT"], icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/bug.svg" },
-  { name: "全部节点", type: "select", "include-all": true, filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP)).*$", icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/adjust.svg" },
+  { name: "全部节点", type: "select", "include-all": true, filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群)).*$", icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/adjust.svg" },
   { ...URLTEST_BASE, name: "自动选择" },
   { name: "香港节点", type: "select", "include-all": true, filter: "(?i)(广港|香港|Hong ?Kong|HKG|🇭🇰|(^|[^A-Z])HK([^A-Z]|$))", icon: "https://flagcdn.com/w320/hk.png" },
   { ...URLTEST_BASE, name: "香港-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(广港|香港|Hong ?Kong|HKG|🇭🇰|(^|[^A-Z])HK([^A-Z]|$))", icon: "https://flagcdn.com/w320/hk.png" },
@@ -391,7 +391,6 @@ PROCESS-NAME,com.oneplus.bbs,国内服务
 PROCESS-NAME,com.oneplus.member,国内服务
 PROCESS-NAME,com.oppo.store,国内服务
 PROCESS-NAME,com.heytap.market,国内服务
-PROCESS-NAME,com.heytap.browser,国内服务
 PROCESS-NAME,com.nearme.instant.platform,国内服务
 PROCESS-NAME,com.netease.uuremote,国内服务
 PROCESS-NAME,com.lptiyu.tanke,国内服务
@@ -451,7 +450,6 @@ PROCESS-NAME,cn.gov.tax.its,国内服务
 PROCESS-NAME,com.cdb.sla,国内服务
 PROCESS-NAME,cn.cyberIdentity.certification,国内服务
 PROCESS-NAME,com.sohu.inputmethod.sogouoem,国内服务
-PROCESS-NAME,com.android.browser,国内服务
 PROCESS-NAME,com.finshell.wallet,国内服务
 PROCESS-NAME,com.unionpay.tsmservice,国内服务
 PROCESS-NAME,com.heytap.cloud,国内服务
@@ -768,17 +766,10 @@ RULE-SET,biliintl,哔哩哔哩港澳台
 DOMAIN-KEYWORD,midea,DIRECT
 DOMAIN-SUFFIX,zalo.me,越南服务
 DOMAIN-SUFFIX,zaloapp.com,越南服务
-DOMAIN-KEYWORD,zalo,越南服务
 DOMAIN-SUFFIX,grab.com,越南服务
-DOMAIN-KEYWORD,grab,越南服务
 DOMAIN-SUFFIX,gojek.com,越南服务
-DOMAIN-KEYWORD,gojek,越南服务
-DOMAIN-KEYWORD,tiki,越南服务
-DOMAIN-KEYWORD,zing,越南服务
 DOMAIN-SUFFIX,nhaccuatui.com,越南服务
 DOMAIN-SUFFIX,vnexpress.net,越南服务
-DOMAIN-KEYWORD,momo,越南服务
-DOMAIN-KEYWORD,zalopay,越南服务
 DOMAIN-SUFFIX,vn,越南服务
 DOMAIN-SUFFIX,com.vn,越南服务
 DOMAIN-SUFFIX,net.vn,越南服务
@@ -797,8 +788,6 @@ DOMAIN-SUFFIX,gearvn.com,越南服务
 DOMAIN-SUFFIX,nguyenkim.com,越南服务
 DOMAIN-SUFFIX,hoanghamobile.com,越南服务
 DOMAIN-SUFFIX,ahamove.com,越南服务
-DOMAIN-KEYWORD,baemin,越南服务
-DOMAIN-KEYWORD,shopeefood,越南服务
 DOMAIN-SUFFIX,fpt.net,越南服务
 DOMAIN-SUFFIX,ghnexpress.com,越南服务
 DOMAIN-SUFFIX,vietnamairlines.com,越南服务
@@ -837,7 +826,15 @@ function deepClone(value) {
 
 // 入口函数：客户端调用 main(config)，返回覆写后的配置。
 function main(config) {
+  const hadTunEnable = Boolean(
+    config.tun && Object.prototype.hasOwnProperty.call(config.tun, "enable")
+  );
+  const tunEnable = hadTunEnable ? config.tun.enable : undefined;
   const next = deepClone(OVERRIDE);
+
   Object.assign(config, next);
+  if (hadTunEnable) {
+    config.tun.enable = tunEnable;
+  }
   return config;
 }
