@@ -144,9 +144,9 @@ def check_group_file(filename: str, *, stash: bool) -> None:
         if name == "电报消息":
             telegram_checked = True
             first_proxy = first_inline_item(value(block, "proxies"))
-            if first_proxy != "自动选择":
+            if first_proxy != "新加坡-自动":
                 fail(
-                    f"{filename}: Telegram must default to 自动选择, "
+                    f"{filename}: Telegram must default to 新加坡-自动, "
                     f"found {first_proxy!r}"
                 )
 
@@ -209,8 +209,8 @@ for line in section.splitlines():
             f"防DNS泄露.js: select group contains {forbidden}: {line.strip()}"
         )
 
-if '{ name: "电报消息", type: "select", proxies: ["自动选择",' not in js_text:
-    fail("防DNS泄露.js: Telegram does not default to 自动选择")
+if '{ name: "电报消息", type: "select", proxies: ["新加坡-自动",' not in js_text:
+    fail("防DNS泄露.js: Telegram does not default to 新加坡-自动")
 
 node_code = r'''
 const fs = require("fs");
