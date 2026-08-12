@@ -1,0 +1,240 @@
+name: Apply confirmed Clash configuration fixes v2
+
+on:
+  push:
+    branches:
+      - agent/fix-confirmed-config-issues
+    paths:
+      - ".github/workflows/apply-confirmed-config-fixes-v2.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    name: Apply synchronized configuration fixes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fix-confirmed-config-issues
+
+      - name: Apply synchronized fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from __future__ import annotations
+
+          from pathlib import Path
+          import re
+
+          MAIN = Path("防DNS泄露.yaml")
+          JS = Path("防DNS泄露.js")
+          STASH = Path("stash.stoverride")
+
+
+          def replace_exact(text: str, old: str, new: str, label: str, expected: int = 1) -> str:
+              actual = text.count(old)
+              if actual != expected:
+                  raise RuntimeError(f"{label}: expected {expected} occurrence(s), found {actual}")
+              return text.replace(old, new)
+
+
+          def remove_matching_lines(
+              text: str,
+              patterns: list[re.Pattern[str]],
+              label: str,
+              expected: int,
+          ) -> str:
+              lines = text.splitlines()
+              kept: list[str] = []
+              removed = 0
+              for line in lines:
+                  if any(pattern.search(line) for pattern in patterns):
+                      removed += 1
+                  else:
+                      kept.append(line)
+              if removed != expected:
+                  raise RuntimeError(f"{label}: expected to remove {expected} line(s), removed {removed}")
+              result = "\n".join(kept)
+              if text.endswith("\n"):
+                  result += "\n"
+              return result
+
+
+          def add_stash_select_intervals(text: str) -> tuple[str, int]:
+              lines = text.splitlines()
+              try:
+                  section_start = next(i for i, line in enumerate(lines) if line.startswith("proxy-groups:"))
+                  section_end = next(
+                      i for i, line in enumerate(lines[section_start + 1 :], section_start + 1)
+                      if line.startswith("rule-providers:")
+                  )
+              except StopIteration as exc:
+                  raise RuntimeError("Could not locate Stash proxy-groups section") from exc
+
+              starts = [
+                  i for i in range(section_start + 1, section_end)
+                  if lines[i].startswith("  - name:")
+              ]
+              blocks = [
+                  (start, starts[index + 1] if index + 1 < len(starts) else section_end)
+                  for index, start in enumerate(starts)
+              ]
+
+              updated = 0
+              for start, end in reversed(blocks):
+                  block = lines[start:end]
+                  if not any(line.strip() == "type: select" for line in block):
+                      continue
+                  block = [line for line in block if not re.match(r"^    interval:\s*", line)]
+                  type_index = next(index for index, line in enumerate(block) if line.strip() == "type: select")
+                  block.insert(type_index + 1, "    interval: -1")
+                  lines[start:end] = block
+                  updated += 1
+
+              if updated < 20:
+                  raise RuntimeError(f"Unexpectedly updated only {updated} Stash select groups")
+              result = "\n".join(lines)
+              if text.endswith("\n"):
+                  result += "\n"
+              return result, updated
+
+
+          main = MAIN.read_text(encoding="utf-8")
+          js = JS.read_text(encoding="utf-8")
+          stash = STASH.read_text(encoding="utf-8")
+
+          # Telegram defaults to the continuously checked main automatic group.
+          telegram_yaml_old = "    proxies: [新加坡-自动, 自动选择, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, 中国-自动, 中国节点, DIRECT]"
+          telegram_yaml_new = "    proxies: [自动选择, 新加坡-自动, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, 中国-自动, 中国节点, DIRECT]"
+          main = replace_exact(main, telegram_yaml_old, telegram_yaml_new, "main Telegram policy")
+
+          telegram_stash_old = "    proxies: [新加坡-自动, 自动选择, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, DIRECT]"
+          telegram_stash_new = "    proxies: [自动选择, 新加坡-自动, 节点选择, 香港-自动, 香港节点, 台湾-自动, 台湾节点, 日本-自动, 日本节点, 新加坡节点, 美国-自动, 美国节点, 韩国-自动, 韩国节点, 越南-自动, 越南节点, DIRECT]"
+          stash = replace_exact(stash, telegram_stash_old, telegram_stash_new, "Stash Telegram policy")
+
+          telegram_js_old = '{ name: "电报消息", type: "select", proxies: ["新加坡-自动", "自动选择", "节点选择",'
+          telegram_js_new = '{ name: "电报消息", type: "select", proxies: ["自动选择", "新加坡-自动", "节点选择",'
+          js = replace_exact(js, telegram_js_old, telegram_js_new, "JavaScript Telegram policy")
+
+          # Browsers remain domain-routed instead of being pinned to 国内服务/DIRECT.
+          browser_patterns = [
+              re.compile(r"PROCESS-NAME,com\.heytap\.browser,国内服务"),
+              re.compile(r"PROCESS-NAME,com\.android\.browser,国内服务"),
+          ]
+          main = remove_matching_lines(main, browser_patterns, "main browser process rules", 2)
+          js = remove_matching_lines(js, browser_patterns, "JavaScript browser process rules", 2)
+          stash = remove_matching_lines(stash, browser_patterns, "Stash browser process rules", 0)
+
+          # Remove broad brand substring rules that can catch unrelated domains.
+          vietnam_keywords = [
+              "zalo", "grab", "gojek", "tiki", "zing", "momo", "zalopay", "baemin", "shopeefood"
+          ]
+          vietnam_patterns = [
+              re.compile(rf"DOMAIN-KEYWORD,{re.escape(keyword)},越南服务(?:\"|$)")
+              for keyword in vietnam_keywords
+          ]
+          main = remove_matching_lines(main, vietnam_patterns, "main broad Vietnam keywords", 9)
+          js = remove_matching_lines(js, vietnam_patterns, "JavaScript broad Vietnam keywords", 9)
+          stash = remove_matching_lines(stash, vietnam_patterns, "Stash broad Vietnam keywords", 9)
+
+          # Keep legitimate CN2/VIP-labelled overseas nodes in the selectable sets.
+          all_nodes_old = "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP)).*$"
+          all_nodes_new = "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群)).*$"
+          auto_old = "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|VIP|回国|中国|CN|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)).*$"
+          auto_new = "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|中国|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)).*$"
+
+          main = replace_exact(main, all_nodes_old, all_nodes_new, "main all-node filter")
+          main = replace_exact(main, auto_old, auto_new, "main automatic filter")
+          js = replace_exact(js, all_nodes_old, all_nodes_new, "JavaScript all-node filter")
+          js = replace_exact(js, auto_old, auto_new, "JavaScript automatic filter")
+          stash = replace_exact(stash, all_nodes_old, all_nodes_new, "Stash all-node filter")
+          stash = replace_exact(stash, auto_old, auto_new, "Stash automatic filter")
+
+          # Preserve the software-managed TUN switch in JavaScript override mode.
+          main_function_old = '''function main(config) {
+            const next = deepClone(OVERRIDE);
+            Object.assign(config, next);
+            return config;
+          }'''
+          main_function_new = '''function main(config) {
+            const hadTunEnable = Boolean(
+              config.tun && Object.prototype.hasOwnProperty.call(config.tun, "enable")
+            );
+            const tunEnable = hadTunEnable ? config.tun.enable : undefined;
+            const next = deepClone(OVERRIDE);
+
+            Object.assign(config, next);
+            if (hadTunEnable) {
+              config.tun.enable = tunEnable;
+            }
+            return config;
+          }'''
+          js = replace_exact(js, main_function_old, main_function_new, "JavaScript main function")
+
+          # Stash recursively tests selector groups by default; interval: -1 disables it.
+          stash, stash_select_count = add_stash_select_intervals(stash)
+          print(f"Set interval: -1 on {stash_select_count} Stash select groups")
+
+          MAIN.write_text(main, encoding="utf-8")
+          JS.write_text(js, encoding="utf-8")
+          STASH.write_text(stash, encoding="utf-8")
+          PY
+
+      - name: Validate transformed files
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruby -e 'require "yaml"; ["防DNS泄露.yaml", "stash.stoverride"].each { |file| YAML.safe_load_file(file, aliases: true); puts "#{file} YAML OK" }'
+          node --check "防DNS泄露.js"
+          node <<'NODE'
+          const fs = require("fs");
+          const vm = require("vm");
+          const code = fs.readFileSync("防DNS泄露.js", "utf8");
+          const sandbox = { console };
+          vm.createContext(sandbox);
+          vm.runInContext(code, sandbox, { filename: "防DNS泄露.js" });
+          const on = vm.runInContext("main({ tun: { enable: true } })", sandbox);
+          const off = vm.runInContext("main({ tun: { enable: false } })", sandbox);
+          if (on.tun.enable !== true || off.tun.enable !== false) {
+            throw new Error("JavaScript override did not preserve tun.enable");
+          }
+          NODE
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          stash = Path("stash.stoverride").read_text(encoding="utf-8").splitlines()
+          start = next(i for i, line in enumerate(stash) if line.startswith("proxy-groups:"))
+          end = next(i for i, line in enumerate(stash[start + 1 :], start + 1) if line.startswith("rule-providers:"))
+          starts = [i for i in range(start + 1, end) if stash[i].startswith("  - name:")]
+          count = 0
+          for index, block_start in enumerate(starts):
+              block_end = starts[index + 1] if index + 1 < len(starts) else end
+              block = stash[block_start:block_end]
+              if any(line.strip() == "type: select" for line in block):
+                  count += 1
+                  if not any(line.strip() == "interval: -1" for line in block):
+                      raise SystemExit(f"Stash select group lacks interval: -1: {block[0]}")
+          if count < 20:
+              raise SystemExit(f"Unexpected Stash select group count: {count}")
+          PY
+          git diff --check
+
+      - name: Commit synchronized fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "防DNS泄露.yaml" "防DNS泄露.js" "stash.stoverride"
+          if git diff --cached --quiet; then
+            echo "No configuration changes were produced" >&2
+            exit 1
+          fi
+          git commit -m "Fix confirmed routing and health-check issues"
+          git push origin HEAD:agent/fix-confirmed-config-issues
