@@ -20,18 +20,18 @@ const META_DOMAIN_PROVIDER = {
 };
 
 
-// 自动测速组通用模板：固定 IP 探测避免 DNS 自依赖。
+// 自动测速组通用模板：全局使用中立端点，地区组覆盖为对应地区端点。
 const URLTEST_BASE = {
   type: "url-test",
   interval: 300,
   tolerance: 50,
-  url: "https://1.1.1.1/cdn-cgi/trace",
-  "expected-status": 200,
+  url: "https://cp.cloudflare.com/generate_204",
+  "expected-status": 204,
   lazy: false,
   hidden: true,
   "include-all": true,
   timeout: 10000,
-  filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|中国|China|上海|北京|广州|深圳|江苏|浙江|🇨🇳)).*$",
+  filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))).*$",
   icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/speed.svg",
 };
 
@@ -107,10 +107,6 @@ const OVERRIDE = {
       "fc00::/7",
       "fe80::/10",
     ],
-    "exclude-package": [
-      "com.tencent.mm",
-      "com.eg.android.AlipayGphone",
-    ],
   },
   dns: {
     enable: true,
@@ -178,6 +174,9 @@ const OVERRIDE = {
     "nameserver-policy": {
       "rule-set:private": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
       "rule-set:cn": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
+      "rule-set:wechat": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
+      "rule-set:alipay": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
+      "+.aliapp.org": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
       "rule-set:microsoft": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
       "+.windowsupdate.com": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
       "+.download.windowsupdate.com": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
@@ -220,22 +219,22 @@ OVERRIDE["proxy-groups"] = [
   { name: "广告过滤", type: "select", proxies: ["REJECT", "DIRECT"], icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/bug.svg" },
   { name: "全部节点", type: "select", "include-all": true, filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群)).*$", icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/adjust.svg" },
   { ...URLTEST_BASE, name: "自动选择" },
-  { name: "香港节点", type: "select", "include-all": true, filter: "(?i)(广港|香港|Hong ?Kong|HKG|🇭🇰|(^|[^A-Z])HK([^A-Z]|$))", icon: "https://flagcdn.com/w320/hk.png" },
-  { ...URLTEST_BASE, name: "香港-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(广港|香港|Hong ?Kong|HKG|🇭🇰|(^|[^A-Z])HK([^A-Z]|$))", icon: "https://flagcdn.com/w320/hk.png" },
-  { name: "台湾节点", type: "select", "include-all": true, filter: "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|TWN|🇹🇼|(^|[^A-Z])TW([^A-Z]|$))", icon: "https://flagcdn.com/w320/tw.png" },
-  { ...URLTEST_BASE, name: "台湾-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|TWN|🇹🇼|(^|[^A-Z])TW([^A-Z]|$))", icon: "https://flagcdn.com/w320/tw.png" },
+  { name: "香港节点", type: "select", "include-all": true, filter: "(?i)(广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$))", icon: "https://flagcdn.com/w320/hk.png" },
+  { ...URLTEST_BASE, name: "香港-自动", url: "https://www.google.com.hk/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$))", icon: "https://flagcdn.com/w320/hk.png" },
+  { name: "台湾节点", type: "select", "include-all": true, filter: "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$))", icon: "https://flagcdn.com/w320/tw.png" },
+  { ...URLTEST_BASE, name: "台湾-自动", url: "https://www.google.com.tw/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$))", icon: "https://flagcdn.com/w320/tw.png" },
   { name: "日本节点", type: "select", "include-all": true, filter: "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$))", icon: "https://flagcdn.com/w320/jp.png" },
-  { ...URLTEST_BASE, name: "日本-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$))", icon: "https://flagcdn.com/w320/jp.png" },
+  { ...URLTEST_BASE, name: "日本-自动", url: "https://www.google.co.jp/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$))", icon: "https://flagcdn.com/w320/jp.png" },
   { name: "新加坡节点", type: "select", "include-all": true, filter: "(?i)(广新|新加坡|坡|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$))", icon: "https://flagcdn.com/w320/sg.png" },
-  { ...URLTEST_BASE, name: "新加坡-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(广新|新加坡|坡|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$))", icon: "https://flagcdn.com/w320/sg.png" },
-  { name: "美国节点", type: "select", "include-all": true, filter: "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United States|USA|🇺🇸|(^|[^A-Z])US([^A-Z]|$))", icon: "https://flagcdn.com/w320/us.png" },
-  { ...URLTEST_BASE, name: "美国-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United States|USA|🇺🇸|(^|[^A-Z])US([^A-Z]|$))", icon: "https://flagcdn.com/w320/us.png" },
+  { ...URLTEST_BASE, name: "新加坡-自动", url: "https://www.google.com.sg/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(广新|新加坡|坡|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$))", icon: "https://flagcdn.com/w320/sg.png" },
+  { name: "美国节点", type: "select", "include-all": true, filter: "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$))", icon: "https://flagcdn.com/w320/us.png" },
+  { ...URLTEST_BASE, name: "美国-自动", url: "https://www.google.com/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$))", icon: "https://flagcdn.com/w320/us.png" },
   { name: "韩国节点", type: "select", "include-all": true, filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))", icon: "https://flagcdn.com/w320/kr.png" },
-  { ...URLTEST_BASE, name: "韩国-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))", icon: "https://flagcdn.com/w320/kr.png" },
-  { name: "越南节点", type: "select", "include-all": true, filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|HCM|🇻🇳|(^|[^A-Z])VN([^A-Z]|$))", icon: "https://flagcdn.com/w320/vn.png" },
-  { ...URLTEST_BASE, name: "越南-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|HCM|🇻🇳|(^|[^A-Z])VN([^A-Z]|$))", icon: "https://flagcdn.com/w320/vn.png" },
+  { ...URLTEST_BASE, name: "韩国-自动", url: "https://www.google.co.kr/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))", icon: "https://flagcdn.com/w320/kr.png" },
+  { name: "越南节点", type: "select", "include-all": true, filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$))", icon: "https://flagcdn.com/w320/vn.png" },
+  { ...URLTEST_BASE, name: "越南-自动", url: "https://www.google.com.vn/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$))", icon: "https://flagcdn.com/w320/vn.png" },
   { name: "中国节点", type: "select", "include-all": true, filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))", icon: "https://flagcdn.com/w320/cn.png" },
-  { name: "中国-自动", type: "url-test", interval: 300, tolerance: 50, url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, hidden: true, "include-all": true, timeout: 10000, filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))", icon: "https://flagcdn.com/w320/cn.png" },
+  { name: "中国-自动", type: "url-test", interval: 300, tolerance: 50, url: "https://www.baidu.com", "expected-status": 200, lazy: true, hidden: true, "include-all": true, timeout: 10000, filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))", icon: "https://flagcdn.com/w320/cn.png" },
 ];
 
 
@@ -244,6 +243,8 @@ OVERRIDE["rule-providers"] = {
   reject: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs", path: "./ruleset/metacubex/category-ads-all.mrs" },
   private: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs", path: "./ruleset/metacubex/private.mrs" },
   cn: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs", path: "./ruleset/metacubex/cn.mrs" },
+  wechat: { type: "http", behavior: "classical", format: "yaml", interval: 86400, proxy: "节点选择", url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/WeChat/WeChat.yaml", path: "./ruleset/blackmatrix7/wechat.yaml" },
+  alipay: { type: "http", behavior: "classical", format: "yaml", interval: 86400, proxy: "节点选择", url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AliPay/AliPay.yaml", path: "./ruleset/blackmatrix7/alipay.yaml" },
   "geolocation-!cn": { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs", path: "./ruleset/metacubex/geolocation-!cn.mrs" },
   google: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs", path: "./ruleset/metacubex/google.mrs" },
   youtube: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs", path: "./ruleset/metacubex/youtube.mrs" },
@@ -331,11 +332,13 @@ PROCESS-NAME,com.google.earth,谷歌服务
 PROCESS-NAME,com.microsoft.appmanager,微软服务
 PROCESS-NAME,com.microsoft.deviceintegrationservice,微软服务
 PROCESS-NAME,com.microsoftsdk.crossdeviceservicebroker,微软服务
+PROCESS-NAME,com.tencent.mm,国内服务
 PROCESS-NAME,com.tencent.mobileqq,国内服务
 PROCESS-NAME,com.tencent.tim,国内服务
 PROCESS-NAME,com.tencent.soter.soterserver,国内服务
 PROCESS-NAME,com.sina.weibo,国内服务
 PROCESS-NAME,com.zhihu.android,国内服务
+PROCESS-NAME,com.eg.android.AlipayGphone,国内服务
 PROCESS-NAME,com.taobao.taobao,国内服务
 PROCESS-NAME,com.tmall.wireless,国内服务
 PROCESS-NAME,com.jingdong.app.mall,国内服务
@@ -804,6 +807,9 @@ DOMAIN-SUFFIX,coolapk.com,国内服务
 DOMAIN-SUFFIX,www.coolapk.com,国内服务
 DOMAIN-SUFFIX,m.coolapk.com,国内服务
 DOMAIN-KEYWORD,coolapk,国内服务
+DOMAIN-SUFFIX,aliapp.org,国内服务
+RULE-SET,wechat,国内服务,no-resolve
+RULE-SET,alipay,国内服务
 RULE-SET,cn,国内服务
 GEOIP,CN,国内服务,no-resolve
 RULE-SET,geolocation-!cn,漏网之鱼

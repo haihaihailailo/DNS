@@ -6,12 +6,16 @@ on:
       - "防DNS泄露.yaml"
       - "防DNS泄露.js"
       - "stash.stoverride"
+      - "shadowrocket.conf"
+      - ".github/scripts/validate_health_checks.py"
       - ".github/workflows/validate-config.yml"
   pull_request:
     paths:
       - "防DNS泄露.yaml"
       - "防DNS泄露.js"
       - "stash.stoverride"
+      - "shadowrocket.conf"
+      - ".github/scripts/validate_health_checks.py"
       - ".github/workflows/validate-config.yml"
   schedule:
     # 每周一 04:30 新加坡时间自动校验一次，提前发现 Mihomo、远程规则或下载链路变化。
@@ -47,6 +51,9 @@ jobs:
         run: |
           node --version
           node --check "防DNS泄露.js"
+
+      - name: Check routing and health-check topology
+        run: python3 .github/scripts/validate_health_checks.py
 
       # JavaScript from an external fork must never be evaluated with the base repository workflow context.
       - name: Compare YAML and JS full config
