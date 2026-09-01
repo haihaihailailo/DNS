@@ -443,7 +443,7 @@ proxy-groups:
   - name: 中国节点
     type: select
     include-all: true
-    filter: "(?i)(广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
+    filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
     icon: "https://flagcdn.com/w320/cn.png"
 
   # 中国-自动：中国/回国节点自动测速组。
@@ -457,7 +457,7 @@ proxy-groups:
     hidden: true
     include-all: true
     timeout: 10000
-    filter: "(?i)(广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
+    filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
     icon: "https://flagcdn.com/w320/cn.png"
 
 

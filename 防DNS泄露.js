@@ -234,8 +234,8 @@ OVERRIDE["proxy-groups"] = [
   { ...URLTEST_BASE, name: "韩国-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))", icon: "https://flagcdn.com/w320/kr.png" },
   { name: "越南节点", type: "select", "include-all": true, filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|HCM|🇻🇳|(^|[^A-Z])VN([^A-Z]|$))", icon: "https://flagcdn.com/w320/vn.png" },
   { ...URLTEST_BASE, name: "越南-自动", url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|HCM|🇻🇳|(^|[^A-Z])VN([^A-Z]|$))", icon: "https://flagcdn.com/w320/vn.png" },
-  { name: "中国节点", type: "select", "include-all": true, filter: "(?i)(广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))", icon: "https://flagcdn.com/w320/cn.png" },
-  { name: "中国-自动", type: "url-test", interval: 300, tolerance: 50, url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, hidden: true, "include-all": true, timeout: 10000, filter: "(?i)(广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))", icon: "https://flagcdn.com/w320/cn.png" },
+  { name: "中国节点", type: "select", "include-all": true, filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))", icon: "https://flagcdn.com/w320/cn.png" },
+  { name: "中国-自动", type: "url-test", interval: 300, tolerance: 50, url: "https://1.1.1.1/cdn-cgi/trace", "expected-status": 200, lazy: true, hidden: true, "include-all": true, timeout: 10000, filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))", icon: "https://flagcdn.com/w320/cn.png" },
 ];
 
 
