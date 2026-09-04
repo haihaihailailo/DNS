@@ -7,7 +7,7 @@ import re
 import subprocess
 import sys
 
-GROUP_HEALTH_CHECKS = {
+AUTOMATIC_HEALTH_CHECKS = {
     "自动选择": ("https://cp.cloudflare.com/generate_204", "204"),
     "香港-自动": ("https://www.google.com.hk/generate_204", "204"),
     "台湾-自动": ("https://www.google.com.tw/generate_204", "204"),
@@ -18,6 +18,41 @@ GROUP_HEALTH_CHECKS = {
     "越南-自动": ("https://www.google.com.vn/generate_204", "204"),
     "中国-自动": ("https://www.baidu.com", "200"),
 }
+SELECT_HEALTH_CHECKS = {
+    "节点选择": ("https://cp.cloudflare.com/generate_204", "204"),
+    "漏网之鱼": ("https://www.gstatic.com/generate_204", "204"),
+    "越南服务": ("https://www.google.com.vn/generate_204", "204"),
+    "国内服务": (
+        "https://connectivitycheck.platform.hicloud.com/generate_204",
+        "204",
+    ),
+    "GitHub": ("https://github.com/favicon.ico", "200"),
+    "YouTube": ("https://www.youtube.com/generate_204", "204"),
+    "Netflix": ("https://www.netflix.com/favicon.ico", "200"),
+    "AI": ("https://chatgpt.com/cdn-cgi/trace", "200"),
+    "谷歌服务": ("https://www.google.com/generate_204", "204"),
+    "电报消息": ("https://telegram.org/favicon.ico", "200"),
+    "Meta / X": ("https://www.facebook.com/favicon.ico", "200"),
+    "游戏平台": ("https://store.steampowered.com/favicon.ico", "200"),
+    "微软服务": ("https://www.microsoft.com/favicon.ico", "200"),
+    "TikTok": ("https://www.tiktok.com/favicon.ico", "200"),
+    "苹果服务": ("https://captive.apple.com/hotspot-detect.html", "200"),
+    "Spotify": ("https://open.spotify.com/favicon.ico", "200"),
+    "哔哩哔哩港澳台": (
+        "https://p.bstarstatic.com/fe-static/deps/bilibili_tv.ico?v=1",
+        "200",
+    ),
+    "全部节点": ("https://connectivitycheck.gstatic.com/generate_204", "204"),
+    "香港节点": ("https://www.google.com.hk/generate_204", "204"),
+    "台湾节点": ("https://www.google.com.tw/generate_204", "204"),
+    "日本节点": ("https://www.google.co.jp/generate_204", "204"),
+    "新加坡节点": ("https://www.google.com.sg/generate_204", "204"),
+    "美国节点": ("https://www.google.com/generate_204", "204"),
+    "韩国节点": ("https://www.google.co.kr/generate_204", "204"),
+    "越南节点": ("https://www.google.com.vn/generate_204", "204"),
+    "中国节点": ("https://www.baidu.com", "200"),
+}
+GROUP_HEALTH_CHECKS = {**SELECT_HEALTH_CHECKS, **AUTOMATIC_HEALTH_CHECKS}
 HEALTH_KEYS = {
     "url",
     "expected-status",
@@ -46,34 +81,53 @@ GOOD_ALL_NODES_FILTER = (
     "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群)).*$"
 )
 GOOD_AUTO_FILTER = (
-    "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))).*$"
+    "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))).*$"
 )
 GOOD_CHINA_FILTER = (
-    "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
+    "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))"
+)
+RETURN_TO_CHINA_EXCLUDE_FILTER = "(?i)(回国|港广|港沪|港深|沪港|深港|广中)"
+GOOD_HONG_KONG_FILTER = (
+    "(?i)(广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$))"
 )
 REGION_FILTERS = {
-    "香港": "(?i)(广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$))",
-    "台湾": "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$))",
-    "日本": "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$))",
-    "新加坡": "(?i)(广新|新加坡|坡|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$))",
+    "香港": GOOD_HONG_KONG_FILTER,
+    "台湾": "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$))",
+    "日本": "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$))",
+    "新加坡": "(?i)(广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$))",
     "美国": "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$))",
-    "韩国": "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))",
-    "越南": "(?i)(越南|Vietnam|Ho ?Chi ?Minh|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$))",
+    "韩国": "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$))",
+    "越南": "(?i)(越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$))",
     "中国": GOOD_CHINA_FILTER,
+}
+PORTABLE_REGION_FILTERS = {
+    region: (
+        pattern
+        if region == "中国"
+        else "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*"
+        + pattern.removeprefix("(?i)")
+    )
+    for region, pattern in REGION_FILTERS.items()
 }
 REGION_GROUP_FILTERS = {
     group_name: pattern
     for region, pattern in REGION_FILTERS.items()
     for group_name in (f"{region}节点", f"{region}-自动")
 }
+PORTABLE_REGION_GROUP_FILTERS = {
+    group_name: PORTABLE_REGION_FILTERS[region]
+    for region in REGION_FILTERS
+    for group_name in (f"{region}节点", f"{region}-自动")
+}
+EXPECTED_INCLUDE_ALL_GROUPS = {"全部节点", "自动选择", *REGION_GROUP_FILTERS}
 REGION_CODE_SAMPLES = {
     "香港": ("[SSR]HK2", "[SSR]HKG2"),
-    "台湾": ("[SSR]TW2", "[SSR]TWN2"),
-    "日本": ("[SSR]JP2",),
-    "新加坡": ("[SSR]SG2",),
+    "台湾": ("[SSR]TW2", "[SSR]TWN2", "[SSR]TPE2"),
+    "日本": ("[SSR]JP2", "[SSR]NRT2", "[SSR]HND2", "[SSR]KIX2"),
+    "新加坡": ("[SSR]SG2", "[SSR]SGP2", "[SSR]SIN2"),
     "美国": ("[SSR]US2", "[SSR]USA2"),
-    "韩国": ("[SSR]KR2",),
-    "越南": ("[SSR]VN2", "[SSR]HCM2"),
+    "韩国": ("[SSR]KR2", "[SSR]ICN2", "[SSR]SEL2"),
+    "越南": ("[SSR]VN2", "[SSR]HCM2", "[SSR]HCMC2", "[SSR]SGN2", "[SSR]HAN2"),
     "中国": ("[SSR]CN2",),
 }
 NON_REGION_SAMPLES = (
@@ -84,6 +138,8 @@ NON_REGION_SAMPLES = (
     "[SSR]ASGARD-01",
     "[SSR]BHKP-01",
     "[SSR]XJPK-01",
+    "[SSR]Chinatown 01",
+    "[SSR]山坡线路",
 )
 RETURN_TO_CHINA_SAMPLES = (
     "[SSR]港广专线3_回国",
@@ -96,6 +152,15 @@ RETURN_TO_CHINA_SAMPLES = (
     "[SSR]广中专线3",
     "[SSR]CN2",
 )
+REGIONAL_RETURN_SAMPLES = {
+    "香港": "[SSR]HK_回国",
+    "台湾": "[SSR]TW_回国",
+    "日本": "[SSR]JP_回国",
+    "新加坡": "[SSR]SG_回国",
+    "美国": "[SSR]US_回国",
+    "韩国": "[SSR]KR_回国",
+    "越南": "[SSR]VN_回国",
+}
 FOREIGN_SAMPLES = (
     "[TRO]新加坡V4",
     "[TRO]日本大阪15",
@@ -109,6 +174,15 @@ DOMESTIC_RULE_PROVIDERS = {
     "wechat": "rule/Clash/WeChat/WeChat.yaml",
     "alipay": "rule/Clash/AliPay/AliPay.yaml",
 }
+RULE_PROVIDER_SIZE_LIMIT = 4194304
+SHADOWROCKET_REQUIRED_RULES = (
+    "rule/Shadowrocket/Twitter/Twitter.list,Meta / X",
+    "rule/Shadowrocket/Facebook/Facebook.list,Meta / X",
+    "rule/Shadowrocket/Steam/Steam.list,游戏平台",
+    "rule/Shadowrocket/Game/Game.list,游戏平台",
+    "rule/Shadowrocket/WeChat/WeChat.list,国内服务",
+    "rule/Shadowrocket/AliPay/AliPay.list,国内服务",
+)
 
 
 def fail(message: str) -> None:
@@ -183,12 +257,30 @@ def shadowrocket_regex(group: str) -> str:
     return match.group(1).strip()
 
 
+def shadowrocket_setting(text: str, key: str) -> list[str]:
+    match = re.search(rf"(?m)^{re.escape(key)}\s*=\s*(.+?)\s*$", text)
+    if not match:
+        fail(f"shadowrocket.conf: setting {key!r} was not found")
+    return [item.strip() for item in match.group(1).split(",") if item.strip()]
+
+
+def shadowrocket_select_members(group: str) -> list[str]:
+    parts = [part.strip() for part in group.split(",")]
+    if not parts or parts[0] != "select":
+        fail("shadowrocket.conf: expected a select policy group")
+    return [part for part in parts[1:] if part and "=" not in part]
+
+
 def check_group_file(filename: str, *, stash: bool) -> None:
     text = Path(filename).read_text(encoding="utf-8")
     telegram_checked = False
     regional_groups_checked: set[str] = set()
     health_groups_checked: set[str] = set()
+    include_all_groups_checked: set[str] = set()
     select_count = 0
+    expected_region_filters = (
+        PORTABLE_REGION_GROUP_FILTERS if stash else REGION_GROUP_FILTERS
+    )
 
     for block in group_blocks(text):
         group_type = value(block, "type")
@@ -214,17 +306,40 @@ def check_group_file(filename: str, *, stash: bool) -> None:
                         f"{filename}: select group {name!r} contains "
                         f"unexpected health-check keys {sorted(unexpected)}"
                     )
+            elif name in SELECT_HEALTH_CHECKS:
+                health_groups_checked.add(name)
+                expected_url, expected_status = SELECT_HEALTH_CHECKS[name]
+                expected_keys = {"url", "expected-status", "timeout"}
+                if direct_keys != expected_keys:
+                    fail(
+                        f"{filename}: select group {name!r} health-check keys "
+                        f"must be {sorted(expected_keys)}, found {sorted(direct_keys)}"
+                    )
+                if value(block, "url") != expected_url:
+                    fail(
+                        f"{filename}: select group {name!r} does not use "
+                        f"{expected_url}"
+                    )
+                if value(block, "expected-status") != expected_status:
+                    fail(
+                        f"{filename}: select group {name!r} expected-status "
+                        f"must be {expected_status}"
+                    )
+                if value(block, "timeout") != "10000":
+                    fail(
+                        f"{filename}: select group {name!r} timeout is not 10000 ms"
+                    )
             elif direct_keys:
                 fail(
-                    f"{filename}: Mihomo select group {name!r} contains "
+                    f"{filename}: select group {name!r} contains unexpected "
                     f"health-check keys {sorted(direct_keys)}"
                 )
 
         if group_type == "url-test" or merged:
-            if name not in GROUP_HEALTH_CHECKS:
+            if name not in AUTOMATIC_HEALTH_CHECKS:
                 fail(f"{filename}: unexpected url-test group {name!r}")
             health_groups_checked.add(name)
-            expected_url, expected_status = GROUP_HEALTH_CHECKS[name]
+            expected_url, expected_status = AUTOMATIC_HEALTH_CHECKS[name]
             if value(block, "url") != expected_url:
                 fail(
                     f"{filename}: url-test group {name!r} does not use "
@@ -245,6 +360,11 @@ def check_group_file(filename: str, *, stash: bool) -> None:
                     f"{filename}: url-test group {name!r} lazy must be "
                     f"{expected_lazy}"
                 )
+
+        if not stash and value(block, "include-all") == "true":
+            include_all_groups_checked.add(name)
+            if value(block, "empty-fallback") != "REJECT":
+                fail(f"{filename}: {name} must fail closed with empty-fallback: REJECT")
 
         if name == "电报消息":
             telegram_checked = True
@@ -274,21 +394,49 @@ def check_group_file(filename: str, *, stash: bool) -> None:
         if name == "自动选择" and value(block, "filter") != GOOD_AUTO_FILTER:
             fail(f"{filename}: automatic selection filter is not synchronized")
 
-        if name in REGION_GROUP_FILTERS:
+        if name in expected_region_filters:
             regional_groups_checked.add(name)
-            if value(block, "filter") != REGION_GROUP_FILTERS[name]:
+            if value(block, "filter") != expected_region_filters[name]:
                 fail(f"{filename}: {name} filter is not synchronized")
+            if (
+                not stash
+                and not name.startswith("中国")
+                and value(block, "exclude-filter") != RETURN_TO_CHINA_EXCLUDE_FILTER
+            ):
+                fail(f"{filename}: {name} does not exclude return-to-China nodes")
 
     if not telegram_checked:
         fail(f"{filename}: Telegram policy group was not found")
     if regional_groups_checked != set(REGION_GROUP_FILTERS):
         missing = sorted(set(REGION_GROUP_FILTERS) - regional_groups_checked)
         fail(f"{filename}: regional policy groups are incomplete: {missing}")
-    if health_groups_checked != set(GROUP_HEALTH_CHECKS):
-        missing = sorted(set(GROUP_HEALTH_CHECKS) - health_groups_checked)
-        fail(f"{filename}: health-check groups are incomplete: {missing}")
+    expected_health_groups = (
+        set(AUTOMATIC_HEALTH_CHECKS) if stash else set(GROUP_HEALTH_CHECKS)
+    )
+    if health_groups_checked != expected_health_groups:
+        missing = sorted(expected_health_groups - health_groups_checked)
+        extra = sorted(health_groups_checked - expected_health_groups)
+        fail(
+            f"{filename}: health-check groups differ; "
+            f"missing={missing}, extra={extra}"
+        )
     if stash and select_count < 20:
         fail(f"{filename}: unexpectedly found only {select_count} select groups")
+    if not stash:
+        direct_include_all_groups = EXPECTED_INCLUDE_ALL_GROUPS - {
+            "香港-自动",
+            "台湾-自动",
+            "日本-自动",
+            "新加坡-自动",
+            "美国-自动",
+            "韩国-自动",
+            "越南-自动",
+        }
+        if include_all_groups_checked != direct_include_all_groups:
+            fail(
+                f"{filename}: directly declared include-all groups differ: "
+                f"{sorted(include_all_groups_checked)}"
+            )
 
 
 check_group_file("防DNS泄露.yaml", stash=False)
@@ -309,6 +457,16 @@ for server in (
     if server not in yaml_text or server not in js_text:
         fail(f"missing direct proxy-server DNS {server}")
 
+for server in (
+    "https://1.1.1.1/dns-query#节点选择",
+    "https://8.8.8.8/dns-query#节点选择",
+):
+    if yaml_text.count(server) < 7 or js_text.count(server) < 7:
+        fail(f"external DNS does not consistently follow 节点选择: {server}")
+
+if "https://8.8.8.8/dns-query#DIRECT" in yaml_text or "https://8.8.8.8/dns-query#DIRECT" in js_text:
+    fail("external fallback DNS is still pinned to DIRECT")
+
 for policy in ("rule-set:wechat", "rule-set:alipay", "+.aliapp.org"):
     if policy not in yaml_text or policy not in js_text:
         fail(f"Mihomo domestic DNS policy is missing: {policy}")
@@ -316,6 +474,19 @@ for policy in ("rule-set:wechat", "rule-set:alipay", "+.aliapp.org"):
 for domain in ("+.alipaylog.com", "+.aliapp.org"):
     if domain not in stash_text:
         fail(f"stash.stoverride: domestic DNS policy is missing: {domain}")
+
+if "  follow-rule: true" not in stash_text:
+    fail("stash.stoverride: DNS queries do not follow routing rules")
+if "  proxy-server-nameserver: #!replace" not in stash_text:
+    fail("stash.stoverride: proxy bootstrap DNS is missing")
+if re.search(r"(?m)^\s+-\s+(?:223\.5\.5\.5|119\.29\.29\.29)\s*$", stash_text):
+    fail("stash.stoverride: plaintext bootstrap DNS remains")
+
+expected_size_line = f"    size-limit: {RULE_PROVIDER_SIZE_LIMIT}"
+if yaml_text.count(expected_size_line) != 4:
+    fail("防DNS泄露.yaml: rule-provider size limits are incomplete")
+if js_text.count(f'"size-limit": {RULE_PROVIDER_SIZE_LIMIT}') != 4:
+    fail("防DNS泄露.js: rule-provider size limits are incomplete")
 
 for filename, text in (
     ("防DNS泄露.yaml", yaml_text),
@@ -336,7 +507,12 @@ for filename, text in (
         fail(f"{filename}: safe automatic filter is missing")
     if GOOD_CHINA_FILTER not in text:
         fail(f"{filename}: return-to-China filter is missing")
-    for group_name, pattern in REGION_GROUP_FILTERS.items():
+    expected_region_filters = (
+        PORTABLE_REGION_GROUP_FILTERS
+        if filename == "stash.stoverride"
+        else REGION_GROUP_FILTERS
+    )
+    for group_name, pattern in expected_region_filters.items():
         if pattern not in text:
             fail(f"{filename}: regional filter is missing for {group_name}")
 
@@ -371,6 +547,7 @@ for package in DOMESTIC_APP_PACKAGES:
 
 china_pattern = re.compile(GOOD_CHINA_FILTER)
 auto_pattern = re.compile(GOOD_AUTO_FILTER)
+return_exclude_pattern = re.compile(RETURN_TO_CHINA_EXCLUDE_FILTER)
 for proxy_name in RETURN_TO_CHINA_SAMPLES:
     if not china_pattern.search(proxy_name):
         fail(f"China filter rejected return node: {proxy_name}")
@@ -379,6 +556,16 @@ for proxy_name in RETURN_TO_CHINA_SAMPLES:
 for proxy_name in FOREIGN_SAMPLES:
     if china_pattern.search(proxy_name):
         fail(f"China filter accepted foreign node: {proxy_name}")
+
+for region, proxy_name in REGIONAL_RETURN_SAMPLES.items():
+    if not china_pattern.search(proxy_name):
+        fail(f"China filter rejected {region} return node: {proxy_name}")
+    if not re.search(REGION_FILTERS[region], proxy_name):
+        fail(f"{region} return test fixture is not recognized by its base filter: {proxy_name}")
+    if not return_exclude_pattern.search(proxy_name):
+        fail(f"regional exclude filter missed return node: {proxy_name}")
+    if re.search(PORTABLE_REGION_FILTERS[region], proxy_name):
+        fail(f"portable {region} filter accepted return node: {proxy_name}")
 
 for region, proxy_names in REGION_CODE_SAMPLES.items():
     pattern = re.compile(REGION_FILTERS[region])
@@ -398,11 +585,18 @@ for group_name, (expected_url, _) in GROUP_HEALTH_CHECKS.items():
     match = re.search(r"(?:^|,)\s*url\s*=\s*([^,\s]+)", group)
     if not match or match.group(1) != expected_url:
         fail(
-            f"shadowrocket.conf: url-test group {group_name!r} does not use "
+            f"shadowrocket.conf: group {group_name!r} does not use "
             f"{expected_url}"
         )
+    if group_name in SELECT_HEALTH_CHECKS:
+        timeout_match = re.search(r"(?:^|,)\s*timeout\s*=\s*(\d+)", group)
+        if not timeout_match or timeout_match.group(1) != "10":
+            fail(
+                f"shadowrocket.conf: select group {group_name!r} "
+                "timeout must be 10 seconds"
+            )
 
-for group_name, expected_filter in REGION_GROUP_FILTERS.items():
+for group_name, expected_filter in PORTABLE_REGION_GROUP_FILTERS.items():
     if shadowrocket_regex(shadowrocket_group(shadowrocket_text, group_name)) != expected_filter:
         fail(f"shadowrocket.conf: {group_name} filter is not synchronized")
 
@@ -424,30 +618,72 @@ for proxy_name in NON_REGION_SAMPLES:
     if not shadow_auto_pattern.search(proxy_name):
         fail(f"shadowrocket.conf: automatic selection rejected non-regional node: {proxy_name}")
 
+for region, proxy_name in REGIONAL_RETURN_SAMPLES.items():
+    shadow_region_pattern = re.compile(
+        shadowrocket_regex(shadowrocket_group(shadowrocket_text, f"{region}节点"))
+    )
+    if shadow_region_pattern.search(proxy_name):
+        fail(f"shadowrocket.conf: {region} filter accepted return node: {proxy_name}")
+
+for key in ("dns-server", "fallback-dns-server", "proxy-dns-server"):
+    for server in shadowrocket_setting(shadowrocket_text, key):
+        if not server.startswith(("https://", "tls://", "quic://", "h3://")):
+            fail(f"shadowrocket.conf: {key} contains plaintext DNS: {server}")
+for server in shadowrocket_setting(shadowrocket_text, "fallback-dns-server"):
+    if "#proxy" not in server.lower():
+        fail(f"shadowrocket.conf: fallback DNS is not proxied: {server}")
+
+shadow_rules = shadowrocket_text.split("[Rule]", 1)[-1]
+advertising_rule = (
+    "rule/Shadowrocket/Advertising/Advertising.list,广告过滤"
+)
+advertising_position = shadow_rules.find(advertising_rule)
+first_service_position = shadow_rules.find("DOMAIN-SUFFIX,chatgpt.com,AI")
+if advertising_position < 0 or first_service_position < 0:
+    fail("shadowrocket.conf: advertising or service routing rule is missing")
+if advertising_position > first_service_position:
+    fail("shadowrocket.conf: advertising rule must precede service rules")
+
+for required_rule in SHADOWROCKET_REQUIRED_RULES:
+    if required_rule not in shadow_rules:
+        fail(f"shadowrocket.conf: synchronized service rule is missing: {required_rule}")
+
+wechat_position = shadow_rules.find("rule/Shadowrocket/WeChat/WeChat.list,国内服务")
+alipay_position = shadow_rules.find("rule/Shadowrocket/AliPay/AliPay.list,国内服务")
+china_position = shadow_rules.find("rule/Shadowrocket/China/China_Domain.list,国内服务")
+if not (0 <= wechat_position < china_position and 0 <= alipay_position < china_position):
+    fail("shadowrocket.conf: WeChat and AliPay rules must precede the general China list")
+
+yaml_select_members = {}
+for block in group_blocks(yaml_text):
+    members = inline_items(value(block, "proxies"))
+    if members:
+        yaml_select_members[value(block, "name")] = members
+for group_name, expected_members in yaml_select_members.items():
+    actual_members = shadowrocket_select_members(
+        shadowrocket_group(shadowrocket_text, group_name)
+    )
+    if actual_members != expected_members:
+        fail(
+            f"shadowrocket.conf: {group_name} members differ from the main config: "
+            f"{actual_members!r}"
+        )
+
+if "policy-select-name=自动选择" not in shadowrocket_group(
+    shadowrocket_text, "节点选择"
+):
+    fail("shadowrocket.conf: 节点选择 must default to 自动选择")
+if "policy-select-name=香港-自动" not in shadowrocket_group(
+    shadowrocket_text, "GitHub"
+):
+    fail("shadowrocket.conf: GitHub must default to 香港-自动")
+
 for group_name in ("国内服务", "越南服务"):
     if not re.match(
         r"select\s*,\s*DIRECT(?:\s*,|$)",
         shadowrocket_group(shadowrocket_text, group_name),
     ):
         fail(f"shadowrocket.conf: {group_name} must default to DIRECT")
-
-section = js_text[js_text.index('OVERRIDE["proxy-groups"] = [') :]
-section = section[: section.index("\n];")]
-for line in section.splitlines():
-    if 'type: "select"' not in line:
-        continue
-    forbidden = [
-        key
-        for key in HEALTH_KEYS
-        if re.search(
-            rf'(?:^|,\s*){re.escape(chr(34) + key + chr(34) if "-" in key else key)}:',
-            line,
-        )
-    ]
-    if forbidden:
-        fail(
-            f"防DNS泄露.js: select group contains {forbidden}: {line.strip()}"
-        )
 
 if '{ name: "电报消息", type: "select", proxies: ["新加坡-自动",' not in js_text:
     fail("防DNS泄露.js: Telegram does not default to 新加坡-自动")
@@ -467,6 +703,25 @@ const disabled = vm.runInContext("main({ tun: { enable: false } })", sandbox);
 process.stdout.write(JSON.stringify({
   enabled: enabled.tun && enabled.tun.enable,
   disabled: disabled.tun && disabled.tun.enable,
+  includeAllGroups: enabled["proxy-groups"]
+    .filter((group) => group["include-all"])
+    .map((group) => ({ name: group.name, emptyFallback: group["empty-fallback"] })),
+  providerSizeLimits: Object.fromEntries(
+    Object.entries(enabled["rule-providers"])
+      .map(([name, provider]) => [name, provider["size-limit"] ?? null])
+  ),
+  dnsFallback: enabled.dns.fallback,
+  proxyGroups: enabled["proxy-groups"].map((group) => ({
+    name: group.name,
+    type: group.type,
+    url: group.url ?? null,
+    expectedStatus: group["expected-status"] ?? null,
+    interval: group.interval ?? null,
+    timeout: group.timeout ?? null,
+    lazy: group.lazy ?? null,
+    tolerance: group.tolerance ?? null,
+    maxFailedTimes: group["max-failed-times"] ?? null,
+  })),
 }));
 '''
 
@@ -476,12 +731,68 @@ try:
         check=True,
         capture_output=True,
         text=True,
+        encoding="utf-8",
     )
 except (OSError, subprocess.CalledProcessError) as exc:
     fail(f"could not evaluate JavaScript override: {exc}")
 
-tun_result = json.loads(completed.stdout)
-if tun_result != {"enabled": True, "disabled": False}:
-    fail(f"JavaScript override did not preserve tun.enable: {tun_result!r}")
+js_result = json.loads(completed.stdout)
+if {key: js_result.get(key) for key in ("enabled", "disabled")} != {
+    "enabled": True,
+    "disabled": False,
+}:
+    fail(f"JavaScript override did not preserve tun.enable: {js_result!r}")
+
+js_groups = {
+    group["name"]: group for group in js_result.get("proxyGroups", [])
+}
+for group_name, (expected_url, expected_status) in SELECT_HEALTH_CHECKS.items():
+    group = js_groups.get(group_name)
+    if not group:
+        fail(f"防DNS泄露.js: select group is missing: {group_name}")
+    if group.get("type") != "select":
+        fail(f"防DNS泄露.js: {group_name} is not a select group")
+    if group.get("url") != expected_url:
+        fail(f"防DNS泄露.js: {group_name} does not use {expected_url}")
+    if str(group.get("expectedStatus")) != expected_status:
+        fail(
+            f"防DNS泄露.js: {group_name} expected-status must be "
+            f"{expected_status}"
+        )
+    if group.get("timeout") != 10000:
+        fail(f"防DNS泄露.js: {group_name} timeout is not 10000 ms")
+    periodic_keys = {
+        key: group.get(key)
+        for key in ("interval", "lazy", "tolerance", "maxFailedTimes")
+        if group.get(key) is not None
+    }
+    if periodic_keys:
+        fail(
+            f"防DNS泄露.js: select group {group_name} enables periodic "
+            f"health checks: {periodic_keys}"
+        )
+
+js_include_all = {
+    item["name"]: item.get("emptyFallback")
+    for item in js_result.get("includeAllGroups", [])
+}
+if set(js_include_all) != EXPECTED_INCLUDE_ALL_GROUPS:
+    fail(f"防DNS泄露.js: include-all groups differ: {sorted(js_include_all)}")
+for group_name, fallback in js_include_all.items():
+    if fallback != "REJECT":
+        fail(f"防DNS泄露.js: {group_name} does not fail closed")
+
+provider_size_limits = js_result.get("providerSizeLimits", {})
+if not provider_size_limits or any(
+    size != RULE_PROVIDER_SIZE_LIMIT for size in provider_size_limits.values()
+):
+    fail(f"防DNS泄露.js: invalid provider size limits: {provider_size_limits!r}")
+
+expected_external_fallback = [
+    "https://1.1.1.1/dns-query#节点选择",
+    "https://8.8.8.8/dns-query#节点选择",
+]
+if js_result.get("dnsFallback") != expected_external_fallback:
+    fail("防DNS泄露.js: external DNS fallback does not follow 节点选择")
 
 print("health-check and routing topology OK")

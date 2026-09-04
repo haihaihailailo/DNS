@@ -6,6 +6,7 @@ on:
       - "防DNS泄露.yaml"
       - "防DNS泄露.js"
       - "stash.stoverride"
+      - "shadowrocket.conf"
       - ".github/scripts/validate_health_checks.py"
       - ".github/workflows/validate-health-checks.yml"
   pull_request:
@@ -13,6 +14,7 @@ on:
       - "防DNS泄露.yaml"
       - "防DNS泄露.js"
       - "stash.stoverride"
+      - "shadowrocket.conf"
       - ".github/scripts/validate_health_checks.py"
       - ".github/workflows/validate-health-checks.yml"
   workflow_dispatch:
@@ -22,12 +24,12 @@ permissions:
 
 jobs:
   validate:
-    name: Reject recursive or duplicate health checks
+    name: Validate scoped group health checks
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Validate proxy-group health-check topology
         run: python3 .github/scripts/validate_health_checks.py

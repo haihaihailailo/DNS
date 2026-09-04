@@ -8,6 +8,7 @@ summary: DNS 防泄露、fake-ip、IPv6、策略组和规则全接管；主订�
 
 dns: #!replace
   enable: true
+  follow-rule: true
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter-mode: blacklist
@@ -35,8 +36,11 @@ dns: #!replace
     - "+.ip6.arpa"
     - "localhost.work.weixin.qq.com"
   default-nameserver: #!replace
-    - 223.5.5.5
-    - 119.29.29.29
+    - https://223.5.5.5/dns-query
+    - https://1.1.1.1/dns-query
+  proxy-server-nameserver: #!replace
+    - https://223.5.5.5/dns-query
+    - https://1.1.1.1/dns-query
   nameserver: #!replace
     - https://223.5.5.5/dns-query
     - https://doh.pub/dns-query
@@ -97,6 +101,7 @@ sniffer: #!replace
     QUIC:
       ports: [443, 8443]
 
+# Stash 会在多个策略组间共享同一代理的测速结果；select 组保持 interval: -1，避免递归周期测速。
 proxy-groups: #!replace
   - name: 节点选择
     type: select
@@ -202,13 +207,13 @@ proxy-groups: #!replace
     url: https://cp.cloudflare.com/generate_204
     timeout: 10000
     lazy: false
-    filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))).*$"
+    filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))).*$"
 
   - name: 香港节点
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$))"
 
   - name: 香港-自动
     type: url-test
@@ -218,13 +223,13 @@ proxy-groups: #!replace
     url: https://www.google.com.hk/generate_204
     timeout: 10000
     lazy: true
-    filter: "(?i)(广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$))"
 
   - name: 台湾节点
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$))"
 
   - name: 台湾-自动
     type: url-test
@@ -234,13 +239,13 @@ proxy-groups: #!replace
     url: https://www.google.com.tw/generate_204
     timeout: 10000
     lazy: true
-    filter: "(?i)(广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$))"
 
   - name: 日本节点
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$))"
 
   - name: 日本-自动
     type: url-test
@@ -250,13 +255,13 @@ proxy-groups: #!replace
     url: https://www.google.co.jp/generate_204
     timeout: 10000
     lazy: true
-    filter: "(?i)(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$))"
 
   - name: 新加坡节点
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(广新|新加坡|坡|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$))"
 
   - name: 新加坡-自动
     type: url-test
@@ -266,13 +271,13 @@ proxy-groups: #!replace
     url: https://www.google.com.sg/generate_204
     timeout: 10000
     lazy: true
-    filter: "(?i)(广新|新加坡|坡|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$))"
 
   - name: 美国节点
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$))"
 
   - name: 美国-自动
     type: url-test
@@ -282,13 +287,13 @@ proxy-groups: #!replace
     url: https://www.google.com/generate_204
     timeout: 10000
     lazy: true
-    filter: "(?i)(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$))"
 
   - name: 韩国节点
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$))"
 
   - name: 韩国-自动
     type: url-test
@@ -298,13 +303,13 @@ proxy-groups: #!replace
     url: https://www.google.co.kr/generate_204
     timeout: 10000
     lazy: true
-    filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$))"
 
   - name: 越南节点
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$))"
 
   - name: 越南-自动
     type: url-test
@@ -314,13 +319,13 @@ proxy-groups: #!replace
     url: https://www.google.com.vn/generate_204
     timeout: 10000
     lazy: true
-    filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$))"
+    filter: "(?i)^(?!.*(回国|港广|港沪|港深|沪港|深港|广中)).*(越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$))"
 
   - name: 中国节点
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
+    filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))"
 
   - name: 中国-自动
     type: url-test
@@ -330,7 +335,7 @@ proxy-groups: #!replace
     url: https://www.baidu.com
     timeout: 10000
     lazy: true
-    filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|China|🇨🇳|(^|[^A-Z])CN([^A-Z]|$))"
+    filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))"
 
 rule-providers: #!replace
   reject:
