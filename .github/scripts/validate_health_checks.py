@@ -28,12 +28,15 @@ SELECT_HEALTH_CHECKS = {
     ),
     "GitHub": ("https://github.com/favicon.ico", "200"),
     "YouTube": ("https://www.youtube.com/generate_204", "204"),
-    "Netflix": ("https://www.netflix.com/favicon.ico", "200"),
-    "AI": ("https://chatgpt.com/cdn-cgi/trace", "200"),
+    "Netflix": (
+        "https://assets.nflxext.com/ffe/siteui/common/icons/nficon2016.ico",
+        "200",
+    ),
+    "AI": ("https://auth.openai.com/favicon.ico", "200"),
     "谷歌服务": ("https://www.google.com/generate_204", "204"),
     "电报消息": ("https://telegram.org/favicon.ico", "200"),
     "Meta / X": ("https://www.facebook.com/favicon.ico", "200"),
-    "游戏平台": ("https://store.steampowered.com/favicon.ico", "200"),
+    "游戏平台": ("https://cdn.cloudflare.steamstatic.com/favicon.ico", "200"),
     "微软服务": ("https://www.microsoft.com/favicon.ico", "200"),
     "TikTok": ("https://www.tiktok.com/favicon.ico", "200"),
     "苹果服务": ("https://captive.apple.com/hotspot-detect.html", "200"),
@@ -80,11 +83,43 @@ FORBIDDEN_BROWSER_PACKAGES = (
 GOOD_ALL_NODES_FILTER = (
     "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群)).*$"
 )
-GOOD_AUTO_FILTER = (
-    "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))).*$"
+RETURN_TO_CHINA_PATTERN = (
+    "(?:回国|港广|港沪|港深|沪港|深港|广中)"
+)
+FOREIGN_REGION_PATTERN = (
+    "(?:广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$)|"
+    "广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|"
+    "(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$)|"
+    "广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|"
+    "(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|"
+    "(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$)|"
+    "广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|"
+    "(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$)|"
+    "广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|"
+    "西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|"
+    "(^|[^A-Z])USA([^A-Z]|$)|"
+    "广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|"
+    "(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$)|"
+    "越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|"
+    "(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|"
+    "(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|"
+    "(^|[^A-Z])HAN([^A-Z]|$)|"
+    "澳门|澳門|Macao|Macau|🇲🇴|(^|[^A-Z])MO([^A-Z]|$)|"
+    "(^|[^A-Z])MFM([^A-Z]|$))"
+)
+DOMESTIC_NODE_PATTERN = (
+    "(?:中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|"
+    "(^|[^A-Z])China([^A-Z]|$)|"
+    "(^|[^A-Z])CN(?!2(?:[^0-9]|$))([^A-Z]|$))"
 )
 GOOD_CHINA_FILTER = (
-    "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))"
+    f"(?i)^(?:.*{RETURN_TO_CHINA_PATTERN}|"
+    f"(?!.*{FOREIGN_REGION_PATTERN}).*{DOMESTIC_NODE_PATTERN}).*$"
+)
+GOOD_AUTO_FILTER = (
+    "(?i)^(?!.*(?:官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群))"
+    f"(?!(?:.*{RETURN_TO_CHINA_PATTERN}|"
+    f"(?!.*{FOREIGN_REGION_PATTERN}).*{DOMESTIC_NODE_PATTERN})).*$"
 )
 RETURN_TO_CHINA_EXCLUDE_FILTER = "(?i)(回国|港广|港沪|港深|沪港|深港|广中)"
 GOOD_HONG_KONG_FILTER = (
@@ -128,7 +163,7 @@ REGION_CODE_SAMPLES = {
     "美国": ("[SSR]US2", "[SSR]USA2"),
     "韩国": ("[SSR]KR2", "[SSR]ICN2", "[SSR]SEL2"),
     "越南": ("[SSR]VN2", "[SSR]HCM2", "[SSR]HCMC2", "[SSR]SGN2", "[SSR]HAN2"),
-    "中国": ("[SSR]CN2",),
+    "中国": ("[SSR]CN", "[SSR]CN01", "[SSR]CN-01", "[SSR]CN02"),
 }
 NON_REGION_SAMPLES = (
     "[SSR]Jerusalem",
@@ -150,7 +185,6 @@ RETURN_TO_CHINA_SAMPLES = (
     "[SSR]港广专线3",
     "[SSR]港沪专线3",
     "[SSR]广中专线3",
-    "[SSR]CN2",
 )
 REGIONAL_RETURN_SAMPLES = {
     "香港": "[SSR]HK_回国",
@@ -166,9 +200,44 @@ FOREIGN_SAMPLES = (
     "[TRO]日本大阪15",
     "[SSR]台湾2",
 )
+FOREIGN_CONTEXT_SAMPLES = (
+    ("[SSR]香港 CN2 GIA", "香港"),
+    ("[SSR]美国 CN2 GIA", "美国"),
+    ("[SSR]中国香港", "香港"),
+    ("[SSR]China Hong Kong", "香港"),
+    ("[SSR]中国台湾", "台湾"),
+    ("[SSR]中国-日本 IPLC", "日本"),
+    ("[SSR]China Mobile HK", "香港"),
+    ("[SSR]澳门 CN2", None),
+    ("[SSR]CN2", None),
+)
 DOMESTIC_APP_PACKAGES = (
     "com.tencent.mm",
     "com.eg.android.AlipayGphone",
+)
+VIETNAM_APP_PACKAGES = (
+    "com.zing.zalo",
+    "com.shopee.vn",
+    "com.grabtaxi.passenger",
+    "xyz.be.customer",
+    "com.jtexpress.customer.vn",
+    "com.viettel.ViettelPost",
+    "com.vnp.myvinaphone",
+    "vn.com.vng.zalopay",
+    "com.mservice.momotransfer",
+    "com.VCB",
+    "vn.com.techcombank.bb.app",
+    "com.vnpay.bidv",
+    "com.mbmobile",
+    "com.vietinbank.ipay",
+    "vn.tiki.app.tikiandroid",
+    "com.lazada.android",
+    "com.deliverynow",
+)
+VIETNAM_EXACT_DOMAINS = (
+    "zalopay.vn",
+    "shopeefood.vn",
+    "techcombank.com",
 )
 DOMESTIC_RULE_PROVIDERS = {
     "wechat": "rule/Clash/WeChat/WeChat.yaml",
@@ -178,10 +247,23 @@ RULE_PROVIDER_SIZE_LIMIT = 4194304
 SHADOWROCKET_REQUIRED_RULES = (
     "rule/Shadowrocket/Twitter/Twitter.list,Meta / X",
     "rule/Shadowrocket/Facebook/Facebook.list,Meta / X",
-    "rule/Shadowrocket/Steam/Steam.list,游戏平台",
-    "rule/Shadowrocket/Game/Game.list,游戏平台",
+    "geo/geosite/steam@cn.list,国内服务",
+    "geo/geosite/category-games-cn.list,国内服务",
+    "geo/geosite/steam.list,游戏平台",
+    "geo/geosite/category-games-!cn.list,游戏平台",
     "rule/Shadowrocket/WeChat/WeChat.list,国内服务",
     "rule/Shadowrocket/AliPay/AliPay.list,国内服务",
+)
+GAME_PROVIDER_ROUTES = {
+    "steam-cn": ("steam@cn.mrs", "国内服务"),
+    "category-games-cn": ("category-games-cn.mrs", "国内服务"),
+    "steam": ("steam.mrs", "游戏平台"),
+    "category-games-global": ("category-games-!cn.mrs", "游戏平台"),
+}
+FORBIDDEN_STEAM_PROCESS_RULES = (
+    "PROCESS-NAME,com.valvesoftware.android.steam.community,游戏平台",
+    "PROCESS-NAME,steam.exe,游戏平台",
+    "PROCESS-NAME,steamwebhelper.exe,游戏平台",
 )
 
 
@@ -467,7 +549,13 @@ for server in (
 if "https://8.8.8.8/dns-query#DIRECT" in yaml_text or "https://8.8.8.8/dns-query#DIRECT" in js_text:
     fail("external fallback DNS is still pinned to DIRECT")
 
-for policy in ("rule-set:wechat", "rule-set:alipay", "+.aliapp.org"):
+for policy in (
+    "rule-set:steam-cn",
+    "rule-set:category-games-cn",
+    "rule-set:wechat",
+    "rule-set:alipay",
+    "+.aliapp.org",
+):
     if policy not in yaml_text or policy not in js_text:
         fail(f"Mihomo domestic DNS policy is missing: {policy}")
 
@@ -492,11 +580,21 @@ for filename, text in (
     ("防DNS泄露.yaml", yaml_text),
     ("防DNS泄露.js", js_text),
     ("stash.stoverride", stash_text),
+    ("shadowrocket.conf", shadowrocket_text),
 ):
     for keyword in FORBIDDEN_VIETNAM_KEYWORDS:
         if f"DOMAIN-KEYWORD,{keyword},越南服务" in text:
             fail(f"{filename}: broad Vietnam DOMAIN-KEYWORD remains: {keyword}")
 
+    for domain in VIETNAM_EXACT_DOMAINS:
+        if f"DOMAIN-SUFFIX,{domain},越南服务" not in text:
+            fail(f"{filename}: precise Vietnam domain is missing: {domain}")
+
+for filename, text in (
+    ("防DNS泄露.yaml", yaml_text),
+    ("防DNS泄露.js", js_text),
+    ("stash.stoverride", stash_text),
+):
     for package in FORBIDDEN_BROWSER_PACKAGES:
         if f"PROCESS-NAME,{package},国内服务" in text:
             fail(f"{filename}: browser is still pinned to 国内服务: {package}")
@@ -536,6 +634,39 @@ for package in DOMESTIC_APP_PACKAGES:
     if process_rule not in yaml_text or process_rule not in js_text:
         fail(f"Android domestic process rule is missing: {package}")
 
+for package in VIETNAM_APP_PACKAGES:
+    process_rule = f"PROCESS-NAME,{package},越南服务"
+    if process_rule not in yaml_text or process_rule not in js_text:
+        fail(f"Android Vietnam process rule is missing: {package}")
+
+for filename, text in (
+    ("防DNS泄露.yaml", yaml_text),
+    ("防DNS泄露.js", js_text),
+    ("stash.stoverride", stash_text),
+):
+    for provider, (source_name, policy) in GAME_PROVIDER_ROUTES.items():
+        if source_name not in text:
+            fail(f"{filename}: game provider source is missing: {source_name}")
+        if f"RULE-SET,{provider},{policy}" not in text:
+            fail(f"{filename}: game provider {provider} is not routed to {policy}")
+    domestic_game_position = text.find("RULE-SET,category-games-cn,国内服务")
+    overseas_game_position = text.find("DOMAIN-SUFFIX,steampowered.com,游戏平台")
+    if not 0 <= domestic_game_position < overseas_game_position:
+        fail(f"{filename}: domestic game rules must precede overseas game rules")
+    if "RULE-SET,category-games,游戏平台" in text:
+        fail(f"{filename}: combined China/global game provider is still active")
+
+for filename, text in (("防DNS泄露.yaml", yaml_text), ("防DNS泄露.js", js_text)):
+    for process_rule in FORBIDDEN_STEAM_PROCESS_RULES:
+        if process_rule in text:
+            fail(f"{filename}: Steam process rule bypasses CN/global domain split")
+
+for filename, text in (("防DNS泄露.yaml", yaml_text), ("防DNS泄露.js", js_text)):
+    if "PROCESS-NAME,tv.danmaku.bili,国内服务" not in text:
+        fail(f"{filename}: mainland Bilibili app must use 国内服务")
+    if "PROCESS-NAME,com.bstar.intl,哔哩哔哩港澳台" not in text:
+        fail(f"{filename}: international Bilibili app routing is missing")
+
 if re.search(
     r"(?m)^\s+-\s+(?:com\.tencent\.mm|com\.eg\.android\.AlipayGphone)\s*$",
     yaml_text,
@@ -556,6 +687,16 @@ for proxy_name in RETURN_TO_CHINA_SAMPLES:
 for proxy_name in FOREIGN_SAMPLES:
     if china_pattern.search(proxy_name):
         fail(f"China filter accepted foreign node: {proxy_name}")
+    if not auto_pattern.search(proxy_name):
+        fail(f"automatic selection rejected foreign node: {proxy_name}")
+
+for proxy_name, expected_region in FOREIGN_CONTEXT_SAMPLES:
+    if china_pattern.search(proxy_name):
+        fail(f"China filter accepted foreign-context node: {proxy_name}")
+    if not auto_pattern.search(proxy_name):
+        fail(f"automatic selection rejected foreign-context node: {proxy_name}")
+    if expected_region and not re.search(REGION_FILTERS[expected_region], proxy_name):
+        fail(f"{expected_region} filter rejected foreign-context node: {proxy_name}")
 
 for region, proxy_name in REGIONAL_RETURN_SAMPLES.items():
     if not china_pattern.search(proxy_name):
@@ -614,6 +755,27 @@ for proxy_name in RETURN_TO_CHINA_SAMPLES:
 for proxy_name in FOREIGN_SAMPLES:
     if shadow_china_pattern.search(proxy_name):
         fail(f"shadowrocket.conf: China filter accepted foreign node: {proxy_name}")
+    if not shadow_auto_pattern.search(proxy_name):
+        fail(f"shadowrocket.conf: automatic selection rejected foreign node: {proxy_name}")
+for proxy_name, expected_region in FOREIGN_CONTEXT_SAMPLES:
+    if shadow_china_pattern.search(proxy_name):
+        fail(f"shadowrocket.conf: China filter accepted foreign-context node: {proxy_name}")
+    if not shadow_auto_pattern.search(proxy_name):
+        fail(
+            "shadowrocket.conf: automatic selection rejected foreign-context "
+            f"node: {proxy_name}"
+        )
+    if expected_region:
+        region_pattern = re.compile(
+            shadowrocket_regex(
+                shadowrocket_group(shadowrocket_text, f"{expected_region}节点")
+            )
+        )
+        if not region_pattern.search(proxy_name):
+            fail(
+                f"shadowrocket.conf: {expected_region} filter rejected "
+                f"foreign-context node: {proxy_name}"
+            )
 for proxy_name in NON_REGION_SAMPLES:
     if not shadow_auto_pattern.search(proxy_name):
         fail(f"shadowrocket.conf: automatic selection rejected non-regional node: {proxy_name}")
@@ -647,6 +809,21 @@ if advertising_position > first_service_position:
 for required_rule in SHADOWROCKET_REQUIRED_RULES:
     if required_rule not in shadow_rules:
         fail(f"shadowrocket.conf: synchronized service rule is missing: {required_rule}")
+
+shadow_domestic_game_position = shadow_rules.find(
+    "geo/geosite/category-games-cn.list,国内服务"
+)
+shadow_overseas_game_position = shadow_rules.find(
+    "DOMAIN-SUFFIX,steampowered.com,游戏平台"
+)
+if not 0 <= shadow_domestic_game_position < shadow_overseas_game_position:
+    fail("shadowrocket.conf: domestic game rules must precede overseas game rules")
+for obsolete_rule in (
+    "rule/Shadowrocket/Steam/Steam.list,游戏平台",
+    "rule/Shadowrocket/Game/Game.list,游戏平台",
+):
+    if obsolete_rule in shadow_rules:
+        fail(f"shadowrocket.conf: obsolete combined game rule remains: {obsolete_rule}")
 
 wechat_position = shadow_rules.find("rule/Shadowrocket/WeChat/WeChat.list,国内服务")
 alipay_position = shadow_rules.find("rule/Shadowrocket/AliPay/AliPay.list,国内服务")

@@ -33,7 +33,7 @@ const URLTEST_BASE = {
   "include-all": true,
   "empty-fallback": "REJECT",
   timeout: 10000,
-  filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))).*$",
+  filter: "(?i)^(?!.*(?:官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群))(?!(?:.*(?:回国|港广|港沪|港深|沪港|深港|广中)|(?!.*(?:广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$)|广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$)|广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$)|广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$)|广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$)|广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$)|越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$)|澳门|澳門|Macao|Macau|🇲🇴|(^|[^A-Z])MO([^A-Z]|$)|(^|[^A-Z])MFM([^A-Z]|$))).*(?:中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN(?!2(?:[^0-9]|$))([^A-Z]|$)))).*$",
   icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/speed.svg",
 };
 
@@ -176,6 +176,8 @@ const OVERRIDE = {
     "nameserver-policy": {
       "rule-set:private": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
       "rule-set:cn": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
+      "rule-set:steam-cn": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
+      "rule-set:category-games-cn": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
       "rule-set:wechat": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
       "rule-set:alipay": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
       "+.aliapp.org": ["https://223.5.5.5/dns-query", "https://doh.pub/dns-query"],
@@ -207,12 +209,12 @@ OVERRIDE["proxy-groups"] = [
   { name: "国内服务", type: "select", proxies: ["DIRECT", "中国-自动", "中国节点", "香港-自动", "香港节点", "节点选择"], url: "https://connectivitycheck.platform.hicloud.com/generate_204", "expected-status": 204, timeout: 10000, icon: "https://flagcdn.com/w320/cn.png" },
   { name: "GitHub", type: "select", proxies: ["香港-自动", "新加坡-自动", "日本-自动", "美国-自动", "香港节点", "新加坡节点", "日本节点", "美国节点", "节点选择", "DIRECT"], url: "https://github.com/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://github.githubassets.com/favicons/favicon.svg" },
   { name: "YouTube", type: "select", proxies: ["节点选择", "自动选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "DIRECT"], url: "https://www.youtube.com/generate_204", "expected-status": 204, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/youtube.svg" },
-  { name: "Netflix", type: "select", proxies: ["节点选择", "自动选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "DIRECT"], url: "https://www.netflix.com/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/icon/netflix.svg" },
-  { name: "AI", type: "select", proxies: ["美国-自动", "日本-自动", "新加坡-自动", "香港-自动", "美国节点", "日本节点", "新加坡节点", "香港节点", "节点选择", "DIRECT"], url: "https://chatgpt.com/cdn-cgi/trace", "expected-status": 200, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/chatgpt.svg" },
+  { name: "Netflix", type: "select", proxies: ["节点选择", "自动选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "DIRECT"], url: "https://assets.nflxext.com/ffe/siteui/common/icons/nficon2016.ico", "expected-status": 200, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/icon/netflix.svg" },
+  { name: "AI", type: "select", proxies: ["美国-自动", "日本-自动", "新加坡-自动", "香港-自动", "美国节点", "日本节点", "新加坡节点", "香港节点", "节点选择", "DIRECT"], url: "https://auth.openai.com/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/chatgpt.svg" },
   { name: "谷歌服务", type: "select", proxies: ["节点选择", "新加坡节点", "日本节点", "香港节点", "美国节点", "新加坡-自动", "日本-自动", "香港-自动", "美国-自动", "自动选择", "DIRECT"], url: "https://www.google.com/generate_204", "expected-status": 204, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/google.svg" },
   { name: "电报消息", type: "select", proxies: ["新加坡-自动", "自动选择", "节点选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "中国-自动", "中国节点", "DIRECT"], url: "https://telegram.org/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg" },
   { name: "Meta / X", type: "select", proxies: ["节点选择", "自动选择", "新加坡-自动", "新加坡节点", "香港-自动", "香港节点", "日本-自动", "日本节点", "美国-自动", "美国节点", "台湾-自动", "台湾节点", "DIRECT"], url: "https://www.facebook.com/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://www.facebook.com/favicon.ico" },
-  { name: "游戏平台", type: "select", proxies: ["节点选择", "DIRECT", "自动选择", "香港-自动", "香港节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点"], url: "https://store.steampowered.com/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://store.steampowered.com/favicon.ico" },
+  { name: "游戏平台", type: "select", proxies: ["节点选择", "DIRECT", "自动选择", "香港-自动", "香港节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点"], url: "https://cdn.cloudflare.steamstatic.com/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://store.steampowered.com/favicon.ico" },
   { name: "微软服务", type: "select", proxies: ["DIRECT", "香港-自动", "新加坡-自动", "中国-自动", "香港节点", "新加坡节点", "中国节点", "美国-自动", "美国节点", "节点选择"], url: "https://www.microsoft.com/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/microsoft.svg" },
   { name: "TikTok", type: "select", proxies: ["节点选择", "自动选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "DIRECT"], url: "https://www.tiktok.com/favicon.ico", "expected-status": 200, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/xiaolin-007/clash@main/icon/tiktok.svg" },
   { name: "苹果服务", type: "select", proxies: ["DIRECT", "自动选择", "节点选择", "香港-自动", "香港节点", "台湾-自动", "台湾节点", "日本-自动", "日本节点", "新加坡-自动", "新加坡节点", "美国-自动", "美国节点", "韩国-自动", "韩国节点", "越南-自动", "越南节点", "中国-自动", "中国节点"], url: "https://captive.apple.com/hotspot-detect.html", "expected-status": 200, timeout: 10000, icon: "https://testingcf.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/apple.svg" },
@@ -235,8 +237,8 @@ OVERRIDE["proxy-groups"] = [
   { ...URLTEST_BASE, name: "韩国-自动", url: "https://www.google.co.kr/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$))", "exclude-filter": "(?i)(回国|港广|港沪|港深|沪港|深港|广中)", icon: "https://flagcdn.com/w320/kr.png" },
   { name: "越南节点", type: "select", "include-all": true, "empty-fallback": "REJECT", filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$))", "exclude-filter": "(?i)(回国|港广|港沪|港深|沪港|深港|广中)", url: "https://www.google.com.vn/generate_204", "expected-status": 204, timeout: 10000, icon: "https://flagcdn.com/w320/vn.png" },
   { ...URLTEST_BASE, name: "越南-自动", url: "https://www.google.com.vn/generate_204", "expected-status": 204, lazy: true, filter: "(?i)(越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$))", "exclude-filter": "(?i)(回国|港广|港沪|港深|沪港|深港|广中)", icon: "https://flagcdn.com/w320/vn.png" },
-  { name: "中国节点", type: "select", "include-all": true, "empty-fallback": "REJECT", filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))", url: "https://www.baidu.com", "expected-status": 200, timeout: 10000, icon: "https://flagcdn.com/w320/cn.png" },
-  { name: "中国-自动", type: "url-test", interval: 300, tolerance: 50, url: "https://www.baidu.com", "expected-status": 200, lazy: true, hidden: true, "include-all": true, "empty-fallback": "REJECT", timeout: 10000, filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))", icon: "https://flagcdn.com/w320/cn.png" },
+  { name: "中国节点", type: "select", "include-all": true, "empty-fallback": "REJECT", filter: "(?i)^(?:.*(?:回国|港广|港沪|港深|沪港|深港|广中)|(?!.*(?:广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$)|广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$)|广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$)|广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$)|广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$)|广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$)|越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$)|澳门|澳門|Macao|Macau|🇲🇴|(^|[^A-Z])MO([^A-Z]|$)|(^|[^A-Z])MFM([^A-Z]|$))).*(?:中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN(?!2(?:[^0-9]|$))([^A-Z]|$))).*$", url: "https://www.baidu.com", "expected-status": 200, timeout: 10000, icon: "https://flagcdn.com/w320/cn.png" },
+  { name: "中国-自动", type: "url-test", interval: 300, tolerance: 50, url: "https://www.baidu.com", "expected-status": 200, lazy: true, hidden: true, "include-all": true, "empty-fallback": "REJECT", timeout: 10000, filter: "(?i)^(?:.*(?:回国|港广|港沪|港深|沪港|深港|广中)|(?!.*(?:广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$)|广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$)|广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$)|广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$)|广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$)|广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$)|越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$)|澳门|澳門|Macao|Macau|🇲🇴|(^|[^A-Z])MO([^A-Z]|$)|(^|[^A-Z])MFM([^A-Z]|$))).*(?:中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN(?!2(?:[^0-9]|$))([^A-Z]|$))).*$", icon: "https://flagcdn.com/w320/cn.png" },
 ];
 
 
@@ -262,7 +264,9 @@ OVERRIDE["rule-providers"] = {
 twitter: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.mrs", path: "./ruleset/metacubex/twitter.mrs" },
   facebook: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs", path: "./ruleset/metacubex/facebook.mrs" },
   steam: { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs", path: "./ruleset/metacubex/steam.mrs" },
-  "category-games": { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.mrs", path: "./ruleset/metacubex/category-games.mrs" },
+  "steam-cn": { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs", path: "./ruleset/metacubex/steam-cn.mrs" },
+  "category-games-cn": { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games-cn.mrs", path: "./ruleset/metacubex/category-games-cn.mrs" },
+  "category-games-global": { ...META_DOMAIN_PROVIDER, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games-!cn.mrs", path: "./ruleset/metacubex/category-games-global.mrs" },
   telegramcidr: { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400, "size-limit": 4194304, proxy: "节点选择", url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs", path: "./ruleset/metacubex/telegramcidr.mrs" },
 };
 
@@ -557,10 +561,9 @@ PROCESS-NAME,com.netflix.mediaclient,Netflix
 PROCESS-NAME,com.spotify.music,Spotify
 PROCESS-NAME,com.zhiliaoapp.musically,TikTok
 PROCESS-NAME,tv.twitch.android.app,节点选择
-PROCESS-NAME,tv.danmaku.bili,哔哩哔哩港澳台
+PROCESS-NAME,tv.danmaku.bili,国内服务
 PROCESS-NAME,com.bstar.intl,哔哩哔哩港澳台
 PROCESS-NAME,com.github.android,GitHub
-PROCESS-NAME,com.valvesoftware.android.steam.community,游戏平台
 PROCESS-NAME,zed.rainxch.githubstore,GitHub
 PROCESS-NAME,com.zing.zalo,越南服务
 PROCESS-NAME,com.shopee.vn,越南服务
@@ -569,6 +572,16 @@ PROCESS-NAME,xyz.be.customer,越南服务
 PROCESS-NAME,com.jtexpress.customer.vn,越南服务
 PROCESS-NAME,com.viettel.ViettelPost,越南服务
 PROCESS-NAME,com.vnp.myvinaphone,越南服务
+PROCESS-NAME,vn.com.vng.zalopay,越南服务
+PROCESS-NAME,com.mservice.momotransfer,越南服务
+PROCESS-NAME,com.VCB,越南服务
+PROCESS-NAME,vn.com.techcombank.bb.app,越南服务
+PROCESS-NAME,com.vnpay.bidv,越南服务
+PROCESS-NAME,com.mbmobile,越南服务
+PROCESS-NAME,com.vietinbank.ipay,越南服务
+PROCESS-NAME,vn.tiki.app.tikiandroid,越南服务
+PROCESS-NAME,com.lazada.android,越南服务
+PROCESS-NAME,com.deliverynow,越南服务
 PROCESS-NAME,org.zwanoo.android.speedtest,节点选择
 PROCESS-NAME,com.mynat.android,节点选择
 PROCESS-NAME,com.eup.hanzii,节点选择
@@ -628,8 +641,6 @@ PROCESS-NAME,MiPhoneManager.exe,国内服务
 PROCESS-NAME,OPPOPCSuite.exe,国内服务
 PROCESS-NAME,OnePlusPCSuite.exe,国内服务
 PROCESS-NAME,Spotify.exe,Spotify
-PROCESS-NAME,steam.exe,游戏平台
-PROCESS-NAME,steamwebhelper.exe,游戏平台
 PROCESS-NAME,GitHubDesktop.exe,GitHub
 PROCESS-NAME,Cursor.exe,AI
 PROCESS-NAME,Windsurf.exe,AI
@@ -750,6 +761,8 @@ DOMAIN-SUFFIX,whatsapp.com,Meta / X
 DOMAIN-SUFFIX,whatsapp.net,Meta / X
 RULE-SET,twitter,Meta / X
 RULE-SET,facebook,Meta / X
+RULE-SET,steam-cn,国内服务
+RULE-SET,category-games-cn,国内服务
 DOMAIN-SUFFIX,steampowered.com,游戏平台
 DOMAIN-SUFFIX,steamcommunity.com,游戏平台
 DOMAIN-SUFFIX,steamstatic.com,游戏平台
@@ -762,7 +775,7 @@ DOMAIN-SUFFIX,riotgames.com,游戏平台
 DOMAIN-SUFFIX,ubisoft.com,游戏平台
 DOMAIN-SUFFIX,ea.com,游戏平台
 RULE-SET,steam,游戏平台
-RULE-SET,category-games,游戏平台
+RULE-SET,category-games-global,游戏平台
 RULE-SET,netflix,Netflix
 RULE-SET,tiktok,TikTok
 RULE-SET,spotify,Spotify
@@ -775,6 +788,9 @@ DOMAIN-SUFFIX,grab.com,越南服务
 DOMAIN-SUFFIX,gojek.com,越南服务
 DOMAIN-SUFFIX,nhaccuatui.com,越南服务
 DOMAIN-SUFFIX,vnexpress.net,越南服务
+DOMAIN-SUFFIX,zalopay.vn,越南服务
+DOMAIN-SUFFIX,shopeefood.vn,越南服务
+DOMAIN-SUFFIX,techcombank.com,越南服务
 DOMAIN-SUFFIX,vn,越南服务
 DOMAIN-SUFFIX,com.vn,越南服务
 DOMAIN-SUFFIX,net.vn,越南服务

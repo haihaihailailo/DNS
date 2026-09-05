@@ -207,7 +207,7 @@ proxy-groups: #!replace
     url: https://cp.cloudflare.com/generate_204
     timeout: 10000
     lazy: false
-    filter: "(?i)^(?!.*(官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群|回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))).*$"
+    filter: "(?i)^(?!.*(?:官网|套餐|流量|异常|剩余|到期|过期|更新|联系|群))(?!(?:.*(?:回国|港广|港沪|港深|沪港|深港|广中)|(?!.*(?:广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$)|广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$)|广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$)|广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$)|广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$)|广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$)|越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$)|澳门|澳門|Macao|Macau|🇲🇴|(^|[^A-Z])MO([^A-Z]|$)|(^|[^A-Z])MFM([^A-Z]|$))).*(?:中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN(?!2(?:[^0-9]|$))([^A-Z]|$)))).*$"
 
   - name: 香港节点
     type: select
@@ -325,7 +325,7 @@ proxy-groups: #!replace
     type: select
     interval: -1
     include-all: true
-    filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))"
+    filter: "(?i)^(?:.*(?:回国|港广|港沪|港深|沪港|深港|广中)|(?!.*(?:广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$)|广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$)|广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$)|广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$)|广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$)|广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$)|越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$)|澳门|澳門|Macao|Macau|🇲🇴|(^|[^A-Z])MO([^A-Z]|$)|(^|[^A-Z])MFM([^A-Z]|$))).*(?:中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN(?!2(?:[^0-9]|$))([^A-Z]|$))).*$"
 
   - name: 中国-自动
     type: url-test
@@ -335,7 +335,7 @@ proxy-groups: #!replace
     url: https://www.baidu.com
     timeout: 10000
     lazy: true
-    filter: "(?i)(回国|港广|港沪|港深|沪港|深港|广中|中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN([^A-Z]|$))"
+    filter: "(?i)^(?:.*(?:回国|港广|港沪|港深|沪港|深港|广中)|(?!.*(?:广港|香港|Hong ?Kong|🇭🇰|(^|[^A-Z])HK([^A-Z]|$)|(^|[^A-Z])HKG([^A-Z]|$)|广台|台湾|台灣|Tai ?Wan|Taiwan|🇹🇼|(^|[^A-Z])TW([^A-Z]|$)|(^|[^A-Z])TWN([^A-Z]|$)|(^|[^A-Z])TPE([^A-Z]|$)|广日|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|Japan|🇯🇵|(^|[^A-Z])JP([^A-Z]|$)|(^|[^A-Z])NRT([^A-Z]|$)|(^|[^A-Z])HND([^A-Z]|$)|(^|[^A-Z])KIX([^A-Z]|$)|广新|新加坡|坡县|狮城|Singapore|🇸🇬|(^|[^A-Z])SG([^A-Z]|$)|(^|[^A-Z])SGP([^A-Z]|$)|(^|[^A-Z])SIN([^A-Z]|$)|广美|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|United ?States|🇺🇸|(^|[^A-Z])US([^A-Z]|$)|(^|[^A-Z])USA([^A-Z]|$)|广韩|韩国|韓國|首尔|春川|Korea|🇰🇷|(^|[^A-Z])KR([^A-Z]|$)|(^|[^A-Z])ICN([^A-Z]|$)|(^|[^A-Z])SEL([^A-Z]|$)|越南|Vietnam|Ho ?Chi ?Minh|胡志明|河内|Hanoi|🇻🇳|(^|[^A-Z])VN([^A-Z]|$)|(^|[^A-Z])HCM([^A-Z]|$)|(^|[^A-Z])HCMC([^A-Z]|$)|(^|[^A-Z])SGN([^A-Z]|$)|(^|[^A-Z])HAN([^A-Z]|$)|澳门|澳門|Macao|Macau|🇲🇴|(^|[^A-Z])MO([^A-Z]|$)|(^|[^A-Z])MFM([^A-Z]|$))).*(?:中国|上海|北京|广州|深圳|江苏|浙江|🇨🇳|(^|[^A-Z])China([^A-Z]|$)|(^|[^A-Z])CN(?!2(?:[^0-9]|$))([^A-Z]|$))).*$"
 
 rule-providers: #!replace
   reject:
@@ -485,13 +485,27 @@ rule-providers: #!replace
     interval: 86400
     url: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/steam.mrs
     path: ./ruleset/metacubex/steam.mrs
-  category-games:
+  steam-cn:
     type: http
     behavior: domain
     format: mrs
     interval: 86400
-    url: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-games.mrs
-    path: ./ruleset/metacubex/category-games.mrs
+    url: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/steam@cn.mrs
+    path: ./ruleset/metacubex/steam-cn.mrs
+  category-games-cn:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-games-cn.mrs
+    path: ./ruleset/metacubex/category-games-cn.mrs
+  category-games-global:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-games-!cn.mrs
+    path: ./ruleset/metacubex/category-games-global.mrs
 
 rules: #!replace
   - IP-CIDR,0.0.0.0/8,DIRECT,no-resolve
@@ -543,6 +557,8 @@ rules: #!replace
   - DOMAIN-SUFFIX,whatsapp.net,Meta / X
   - RULE-SET,twitter,Meta / X
   - RULE-SET,facebook,Meta / X
+  - RULE-SET,steam-cn,国内服务
+  - RULE-SET,category-games-cn,国内服务
   - DOMAIN-SUFFIX,steampowered.com,游戏平台
   - DOMAIN-SUFFIX,steamcommunity.com,游戏平台
   - DOMAIN-SUFFIX,steamstatic.com,游戏平台
@@ -555,7 +571,7 @@ rules: #!replace
   - DOMAIN-SUFFIX,ubisoft.com,游戏平台
   - DOMAIN-SUFFIX,ea.com,游戏平台
   - RULE-SET,steam,游戏平台
-  - RULE-SET,category-games,游戏平台
+  - RULE-SET,category-games-global,游戏平台
   - RULE-SET,netflix,Netflix
   - RULE-SET,tiktok,TikTok
   - RULE-SET,spotify,Spotify
@@ -568,6 +584,9 @@ rules: #!replace
   - DOMAIN-SUFFIX,gojek.com,越南服务
   - DOMAIN-SUFFIX,nhaccuatui.com,越南服务
   - DOMAIN-SUFFIX,vnexpress.net,越南服务
+  - DOMAIN-SUFFIX,zalopay.vn,越南服务
+  - DOMAIN-SUFFIX,shopeefood.vn,越南服务
+  - DOMAIN-SUFFIX,techcombank.com,越南服务
   - DOMAIN-SUFFIX,vn,越南服务
   - DOMAIN-SUFFIX,baomoi.com,越南服务
   - DOMAIN-SUFFIX,thegioididong.com,越南服务

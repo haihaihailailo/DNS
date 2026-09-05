@@ -249,7 +249,11 @@ jobs:
             country_codes.each do |region, code|
               ["#{region}节点", "#{region}-自动"].each do |name|
                 filter = group_map.dig(name, "filter").to_s
-                boundary = "(^|[^A-Z])#{code}([^A-Z]|$)"
+                boundary = if region == "中国"
+                  "(^|[^A-Z])CN(?!2(?:[^0-9]|$))([^A-Z]|$)"
+                else
+                  "(^|[^A-Z])#{code}([^A-Z]|$)"
+                end
                 errors << "#{name} filter lacks a bounded #{code} token" unless filter.include?(boundary)
               end
             end
